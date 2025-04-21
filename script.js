@@ -171,7 +171,8 @@ class AESHandler {
 
   static async encrypt(text, keyString) {
     const key = await this.generateKey(keyString);
-    const iv = crypto.getRandomValues(new Uint8Array(16));
+    // Use a fixed IV (16 bytes of zeros) for consistent output
+    const iv = new Uint8Array(16);
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
 
