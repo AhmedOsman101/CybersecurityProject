@@ -6,6 +6,7 @@ language-servers = [
   { name = "typescript-language-server", except-features = [
     "format",
   ] },
+  "deno-lsp",
 ]
 
 [[language]]
@@ -16,4 +17,5 @@ language-servers = [
   { name = "typescript-language-server", except-features = [
     "format",
   ] },
+  "deno-lsp",
 ]
