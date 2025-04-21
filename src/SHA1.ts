@@ -85,7 +85,8 @@ function sha1(message: string): string {
 
     // Main loop: 80 rounds of hashing
     for (let t = 0; t < 80; t++) {
-      let f: number, k: number;
+      let f: number;
+      let k: number;
 
       // Round-based function selection and constant
       if (t <= 19) {
