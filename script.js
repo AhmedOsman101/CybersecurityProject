@@ -72,7 +72,7 @@ class RSAHandler {
         name: "RSA-OAEP",
         modulusLength: 2048,
         publicExponent: new Uint8Array([1, 0, 1]),
-        hash: "SHA-256",
+        hash: "SHA-1",
       },
       true,
       ["encrypt", "decrypt"]
@@ -105,7 +105,7 @@ class RSAHandler {
         binaryDer,
         {
           name: "RSA-OAEP",
-          hash: "SHA-256",
+          hash: "SHA-1",
         },
         true,
         ["encrypt"]
@@ -123,7 +123,7 @@ class RSAHandler {
         binaryDer,
         {
           name: "RSA-OAEP",
-          hash: "SHA-256",
+          hash: "SHA-1",
         },
         true,
         ["decrypt"]
@@ -139,7 +139,14 @@ class RSAHandler {
       const encoder = new TextEncoder();
       const data = encoder.encode(text);
 
-      const encrypted = await crypto.subtle.encrypt({ name: "RSA-OAEP" }, publicKey, data);
+      const encrypted = await crypto.subtle.encrypt(
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-1",
+        },
+        publicKey,
+        data
+      );
 
       return utils.arrayBufferToBase64(encrypted);
     } catch (error) {
@@ -152,7 +159,14 @@ class RSAHandler {
       const privateKey = await this.importPrivateKey(privateKeyPem);
       const encryptedData = utils.base64ToArrayBuffer(encryptedBase64);
 
-      const decrypted = await crypto.subtle.decrypt({ name: "RSA-OAEP" }, privateKey, encryptedData);
+      const decrypted = await crypto.subtle.decrypt(
+        {
+          name: "RSA-OAEP",
+          hash: "SHA-1",
+        },
+        privateKey,
+        encryptedData
+      );
 
       return new TextDecoder().decode(decrypted);
     } catch (error) {
@@ -179,20 +193,15 @@ class AESHandler {
     const encrypted = await crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, data);
 
     const encryptedArray = new Uint8Array(encrypted);
-    return {
-      iv: Array.from(iv)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join(""),
-      data: Array.from(encryptedArray)
-        .map((b) => b.toString(16).padStart(2, "0"))
-        .join(""),
-    };
+    return Array.from(encryptedArray)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   }
 
-  static async decrypt(encryptedObj, keyString) {
+  static async decrypt(encryptedHex, keyString) {
     const key = await this.generateKey(keyString);
-    const iv = new Uint8Array(encryptedObj.iv.match(/.{2}/g).map((byte) => parseInt(byte, 16)));
-    const encryptedData = new Uint8Array(encryptedObj.data.match(/.{2}/g).map((byte) => parseInt(byte, 16)));
+    const iv = new Uint8Array(16); // Same fixed IV used in encryption
+    const encryptedData = new Uint8Array(encryptedHex.match(/.{2}/g).map((byte) => parseInt(byte, 16)));
 
     const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv }, key, encryptedData);
 
@@ -298,7 +307,7 @@ class CryptographyVisualizer {
   }
 
   async handleAESEncrypt() {
-    const text = this.elements.aes.input.value;
+    const text = this.elements.aes.input.value.trim();
     const key = this.elements.aes.key.value;
     const error = utils.validateInput(text, key);
 
@@ -309,19 +318,19 @@ class CryptographyVisualizer {
 
     try {
       const encrypted = await AESHandler.encrypt(text, key);
-      this.elements.aes.input.dataset.encrypted = JSON.stringify(encrypted);
-      utils.showResult(text, encrypted.data, "encrypted", this.elements.result);
+      this.elements.aes.input.value = encrypted;
+      utils.showResult(text, encrypted, "encrypted", this.elements.result);
     } catch (error) {
       utils.showError(`Error encrypting: ${error.message}`, this.elements.result);
     }
   }
 
   async handleAESDecrypt() {
-    const encryptedData = this.elements.aes.input.dataset.encrypted;
+    const encryptedHex = this.elements.aes.input.value.trim();
     const key = this.elements.aes.key.value;
 
-    if (!encryptedData) {
-      utils.showError("Please encrypt some text first", this.elements.result);
+    if (!encryptedHex) {
+      utils.showError("Please enter encrypted text to decrypt", this.elements.result);
       return;
     }
 
@@ -332,16 +341,16 @@ class CryptographyVisualizer {
     }
 
     try {
-      const encrypted = JSON.parse(encryptedData);
-      const decrypted = await AESHandler.decrypt(encrypted, key);
-      utils.showResult(encrypted.data, decrypted, "decrypted", this.elements.result);
+      const decrypted = await AESHandler.decrypt(encryptedHex, key);
+      this.elements.aes.input.value = decrypted;
+      utils.showResult(encryptedHex, decrypted, "decrypted", this.elements.result);
     } catch (error) {
       utils.showError(`Error decrypting: ${error.message}`, this.elements.result);
     }
   }
 
   async handleRSAEncrypt() {
-    const text = this.elements.rsa.input.value;
+    const text = this.elements.rsa.input.value.trim();
     if (!text) {
       utils.showError("Please enter text to encrypt", this.elements.result);
       return;
@@ -349,7 +358,7 @@ class CryptographyVisualizer {
 
     try {
       const encrypted = await RSAHandler.encrypt(text, this.currentKeys.publicKey);
-      this.elements.rsa.input.dataset.encrypted = encrypted;
+      this.elements.rsa.input.value = encrypted; // Show encrypted text in textarea
       utils.showResult(text, encrypted, "encrypted", this.elements.result);
     } catch (error) {
       utils.showError(`Error encrypting: ${error.message}`, this.elements.result);
@@ -357,15 +366,16 @@ class CryptographyVisualizer {
   }
 
   async handleRSADecrypt() {
-    const encryptedData = this.elements.rsa.input.dataset.encrypted;
-    if (!encryptedData) {
-      utils.showError("Please encrypt some text first", this.elements.result);
+    const encryptedText = this.elements.rsa.input.value.trim();
+    if (!encryptedText) {
+      utils.showError("Please enter encrypted text to decrypt", this.elements.result);
       return;
     }
 
     try {
-      const decrypted = await RSAHandler.decrypt(encryptedData, this.currentKeys.privateKey);
-      utils.showResult(encryptedData, decrypted, "decrypted", this.elements.result);
+      const decrypted = await RSAHandler.decrypt(encryptedText, this.currentKeys.privateKey);
+      this.elements.rsa.input.value = decrypted; // Show decrypted text in textarea
+      utils.showResult(encryptedText, decrypted, "decrypted", this.elements.result);
     } catch (error) {
       utils.showError(`Error decrypting: ${error.message}`, this.elements.result);
     }

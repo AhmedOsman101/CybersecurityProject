@@ -40,11 +40,11 @@
         <section id="aes-section" class="crypto-section hidden">
           <div class="section-header">
             <h2>AES Encryption/Decryption</h2>
-            <p class="section-description">Encrypt or decrypt text using AES-ECB mode</p>
+            <p class="section-description">Encrypt or decrypt text using AES-CBC mode</p>
           </div>
           <div class="input-group">
-            <label for="aesInput">Enter text:</label>
-            <input type="text" id="aesInput" placeholder="Enter text..." />
+            <label for="aesInput">Enter text to encrypt/decrypt:</label>
+            <textarea id="aesInput" placeholder="Enter text..." rows="4"></textarea>
             <label for="aesKey">Enter 16-character key:</label>
             <input type="text" id="aesKey" placeholder="Enter key (16 characters)" />
             <div class="button-group">
@@ -73,7 +73,7 @@
           </div>
           <div class="input-group">
             <label for="rsaInput">Enter text to encrypt/decrypt:</label>
-            <input type="text" id="rsaInput" placeholder="Enter text..." />
+            <textarea id="rsaInput" placeholder="Enter text..." rows="4"></textarea>
             <div class="button-group">
               <button id="encryptRSA" class="primary-button">Encrypt</button>
               <button id="decryptRSA" class="secondary-button">Decrypt</button>
