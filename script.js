@@ -18,13 +18,17 @@ const utils = {
   validateInput: (input, key = null) => {
     if (!input) return "Please enter text to process";
     if (key !== null && !key) return "Please enter a key";
-    if (key !== null && key.length !== 16 && !key.includes("-----BEGIN")) return "Key must be exactly 16 characters long";
+    if (key !== null && key.length !== 16 && !key.includes("-----BEGIN"))
+      return "Key must be exactly 16 characters long";
     return null;
   },
 
   arrayBufferToBase64(buffer) {
     const bytes = new Uint8Array(buffer);
-    const binary = bytes.reduce((str, byte) => str + String.fromCharCode(byte), "");
+    const binary = bytes.reduce(
+      (str, byte) => str + String.fromCharCode(byte),
+      ""
+    );
     return window.btoa(binary);
   },
 
@@ -60,7 +64,7 @@ class SHA1Handler {
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-1", data);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
   }
 }
 
@@ -180,7 +184,10 @@ class AESHandler {
   static async generateKey(keyString) {
     const encoder = new TextEncoder();
     const keyData = encoder.encode(keyString);
-    return await crypto.subtle.importKey("raw", keyData, "AES-CBC", false, ["encrypt", "decrypt"]);
+    return await crypto.subtle.importKey("raw", keyData, "AES-CBC", false, [
+      "encrypt",
+      "decrypt",
+    ]);
   }
 
   static async encrypt(text, keyString) {
@@ -190,20 +197,30 @@ class AESHandler {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
 
-    const encrypted = await crypto.subtle.encrypt({ name: "AES-CBC", iv }, key, data);
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-CBC", iv },
+      key,
+      data
+    );
 
     const encryptedArray = new Uint8Array(encrypted);
     return Array.from(encryptedArray)
-      .map((b) => b.toString(16).padStart(2, "0"))
+      .map(b => b.toString(16).padStart(2, "0"))
       .join("");
   }
 
   static async decrypt(encryptedHex, keyString) {
     const key = await this.generateKey(keyString);
     const iv = new Uint8Array(16); // Same fixed IV used in encryption
-    const encryptedData = new Uint8Array(encryptedHex.match(/.{2}/g).map((byte) => parseInt(byte, 16)));
+    const encryptedData = new Uint8Array(
+      encryptedHex.match(/.{2}/g).map(byte => Number.parseInt(byte, 16))
+    );
 
-    const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv }, key, encryptedData);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-CBC", iv },
+      key,
+      encryptedData
+    );
 
     return new TextDecoder().decode(decrypted);
   }
@@ -249,13 +266,27 @@ class CryptographyVisualizer {
 
   addEventListeners() {
     // Add event listeners
-    this.elements.algorithmSelect.addEventListener("change", () => this.showSelectedAlgorithm());
-    this.elements.sha1.button.addEventListener("click", () => this.handleSHA1());
-    this.elements.aes.encryptBtn.addEventListener("click", () => this.handleAESEncrypt());
-    this.elements.aes.decryptBtn.addEventListener("click", () => this.handleAESDecrypt());
-    this.elements.rsa.generateKeysBtn.addEventListener("click", () => this.generateAndDisplayRSAKeys());
-    this.elements.rsa.encryptBtn.addEventListener("click", () => this.handleRSAEncrypt());
-    this.elements.rsa.decryptBtn.addEventListener("click", () => this.handleRSADecrypt());
+    this.elements.algorithmSelect.addEventListener("change", () =>
+      this.showSelectedAlgorithm()
+    );
+    this.elements.sha1.button.addEventListener("click", () =>
+      this.handleSHA1()
+    );
+    this.elements.aes.encryptBtn.addEventListener("click", () =>
+      this.handleAESEncrypt()
+    );
+    this.elements.aes.decryptBtn.addEventListener("click", () =>
+      this.handleAESDecrypt()
+    );
+    this.elements.rsa.generateKeysBtn.addEventListener("click", () =>
+      this.generateAndDisplayRSAKeys()
+    );
+    this.elements.rsa.encryptBtn.addEventListener("click", () =>
+      this.handleRSAEncrypt()
+    );
+    this.elements.rsa.decryptBtn.addEventListener("click", () =>
+      this.handleRSADecrypt()
+    );
   }
 
   showSelectedAlgorithm() {
@@ -285,7 +316,10 @@ class CryptographyVisualizer {
       this.elements.rsa.privateKeyDisplay.textContent = privateKey;
       this.currentKeys = { publicKey, privateKey };
     } catch (error) {
-      utils.showError("Error generating RSA keys: " + error.message, this.elements.result);
+      utils.showError(
+        "Error generating RSA keys: " + error.message,
+        this.elements.result
+      );
     }
   }
 
@@ -302,7 +336,10 @@ class CryptographyVisualizer {
       const hash = await SHA1Handler.hash(text);
       utils.showResult(text, hash, "hash", this.elements.result);
     } catch (error) {
-      utils.showError(`Error generating hash: ${error.message}`, this.elements.result);
+      utils.showError(
+        `Error generating hash: ${error.message}`,
+        this.elements.result
+      );
     }
   }
 
@@ -321,7 +358,10 @@ class CryptographyVisualizer {
       this.elements.aes.input.value = encrypted;
       utils.showResult(text, encrypted, "encrypted", this.elements.result);
     } catch (error) {
-      utils.showError(`Error encrypting: ${error.message}`, this.elements.result);
+      utils.showError(
+        `Error encrypting: ${error.message}`,
+        this.elements.result
+      );
     }
   }
 
@@ -330,7 +370,10 @@ class CryptographyVisualizer {
     const key = this.elements.aes.key.value;
 
     if (!encryptedHex) {
-      utils.showError("Please enter encrypted text to decrypt", this.elements.result);
+      utils.showError(
+        "Please enter encrypted text to decrypt",
+        this.elements.result
+      );
       return;
     }
 
@@ -343,9 +386,17 @@ class CryptographyVisualizer {
     try {
       const decrypted = await AESHandler.decrypt(encryptedHex, key);
       this.elements.aes.input.value = decrypted;
-      utils.showResult(encryptedHex, decrypted, "decrypted", this.elements.result);
+      utils.showResult(
+        encryptedHex,
+        decrypted,
+        "decrypted",
+        this.elements.result
+      );
     } catch (error) {
-      utils.showError(`Error decrypting: ${error.message}`, this.elements.result);
+      utils.showError(
+        `Error decrypting: ${error.message}`,
+        this.elements.result
+      );
     }
   }
 
@@ -357,27 +408,47 @@ class CryptographyVisualizer {
     }
 
     try {
-      const encrypted = await RSAHandler.encrypt(text, this.currentKeys.publicKey);
+      const encrypted = await RSAHandler.encrypt(
+        text,
+        this.currentKeys.publicKey
+      );
       this.elements.rsa.input.value = encrypted; // Show encrypted text in textarea
       utils.showResult(text, encrypted, "encrypted", this.elements.result);
     } catch (error) {
-      utils.showError(`Error encrypting: ${error.message}`, this.elements.result);
+      utils.showError(
+        `Error encrypting: ${error.message}`,
+        this.elements.result
+      );
     }
   }
 
   async handleRSADecrypt() {
     const encryptedText = this.elements.rsa.input.value.trim();
     if (!encryptedText) {
-      utils.showError("Please enter encrypted text to decrypt", this.elements.result);
+      utils.showError(
+        "Please enter encrypted text to decrypt",
+        this.elements.result
+      );
       return;
     }
 
     try {
-      const decrypted = await RSAHandler.decrypt(encryptedText, this.currentKeys.privateKey);
+      const decrypted = await RSAHandler.decrypt(
+        encryptedText,
+        this.currentKeys.privateKey
+      );
       this.elements.rsa.input.value = decrypted; // Show decrypted text in textarea
-      utils.showResult(encryptedText, decrypted, "decrypted", this.elements.result);
+      utils.showResult(
+        encryptedText,
+        decrypted,
+        "decrypted",
+        this.elements.result
+      );
     } catch (error) {
-      utils.showError(`Error decrypting: ${error.message}`, this.elements.result);
+      utils.showError(
+        `Error decrypting: ${error.message}`,
+        this.elements.result
+      );
     }
   }
 }
