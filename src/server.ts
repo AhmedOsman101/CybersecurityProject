@@ -88,7 +88,16 @@ router
   })
   .get("/rsa", ctx => {
     // Pass custom input to the about page
-    const html = rsaPage.render();
+    const html = rsaPage.render({
+      text: "",
+      key: "",
+      encrypted: "",
+      decrypted: "",
+      mode: "e",
+    });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
     ctx.response.body = html;
     ctx.response.type = "text/html";
   });
