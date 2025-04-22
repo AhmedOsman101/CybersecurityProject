@@ -1,12 +1,22 @@
+import styles from "../styles.ts";
+
 type Props = {
   text: string;
   key: string;
   encrypted: string;
   decrypted: string;
   error?: boolean;
+  mode: "e" | "d";
 };
 
-export function render(props: Props): string {
+export function render({
+  text,
+  key,
+  encrypted,
+  decrypted,
+  error,
+  mode,
+}: Props): string {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -16,50 +26,63 @@ export function render(props: Props): string {
           name="viewport"
           content="width=device-width, initial-scale=1.0" />
         <title>Cybersecurity Project - AES-ECB</title>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css" />
+        <style>${styles}</style>
       </head>
       <body>
-        <center>
-          <div>
-            <h1>Encrypt/Decrypt Text with AES (ECB mode)</h1>
+      <header style="text-align: center; padding: 20px;">
+          <h1>Encrypt/Decrypt Text with AES (ECB mode)</h1>
+          <nav>
             <p>Navigation</p>
-            <a href="/">Homepage</a>
-            <br />
-            <a href="/sha-1">Use SHA-1</a>
-            <br />
+            <a href="/">Homepage</a><br>
+            <a href="/sha-1">Use SHA-1</a><br>
             <a href="/rsa">Use RSA with LCG key generation</a>
-          </div>
-          <div>
-            <h1>AES-ECB</h1>
-            <form action="/aes" method="post">
-              <label for="text">Text:</label>
-              <input type="text" id="text" name="text" required value="${props.text}" />
-              <br />
-              <label for="key">Enter AES Key (16, 24, or 32 characters):</label>
-              <textarea id="key" name="key" rows="2">${props.key}</textarea>
-              <span style="color: red; display: ${
-                props.error ? "block" : "none"
-              };">
+          </nav>
+        </header>
+        <main class="container">
+          <section class="column">
+            <h2>Encryption</h2>
+            <form action="/aes/encrypt" method="post">
+              <label for="encrypt-text">Input Text:</label>
+              <textarea id="encrypt-text" name="text" rows="4" placeholder="Enter text to encrypt">${mode === "e" ? text : ""}</textarea>
+              <label for="encrypt-key">Encryption Key (16, 24, or 32 characters):</label>
+              <textarea id="encrypt-key" name="key" rows="2" placeholder="Enter AES key">${mode === "e" ? key : ""}</textarea>
+              <span class="error ${error && mode === "e" ? "visible" : ""}">
                 Key must be 16, 24, or 32 characters long.
               </span>
-              <br />
-              <label for="text">Encrypted Text:</label>
-              <textarea id="encrypted" name="encrypted" rows="2" readonly>${
-                props.encrypted
-              }</textarea>
-              <br />
-              <label for="text">Decrypted Text:</label>
-              <textarea id="decrypted" name="decrypted" rows="2" readonly>${
-                props.decrypted
-              }</textarea>
-              <br />
-              <button type="submit">Process</button>
+              <label for="encrypt-output">Encrypted Output:</label>
+              <textarea id="encrypt-output" name="encrypted" rows="4" readonly>${mode === "e" ? encrypted : ""}</textarea>
+              <button type="submit">Encrypt</button>
             </form>
-            <br />
-          </div>
-        </center>
+          </section>
+          <section class="column">
+            <h2>Decryption</h2>
+            <form action="/aes/decrypt" method="post">
+              <label for="decrypt-cipher">Cipher Text:</label>
+              <textarea
+                id="decrypt-cipher"
+                name="encrypted"
+                rows="4"
+                placeholder="Enter cipher text"
+              >${mode === "d" ? encrypted : ""}</textarea>
+              <label for="decrypt-key">Decryption Key (16, 24, or 32 characters):</label>
+              <textarea
+                id="decrypt-key"
+                name="key" rows="2"
+                placeholder="Enter AES key"
+              >${mode === "d" ? key : ""}</textarea>
+              <span class="error ${error && mode === "d" ? "visible" : ""}">
+                Key must be 16, 24, or 32 characters long.
+              </span>
+              <label for="decrypt-output">Decrypted Output:</label>
+              <textarea
+                id="decrypt-output"
+                name="decrypted"
+                rows="4" readonly
+              >${mode === "d" ? decrypted : ""}</textarea>
+              <button type="submit">Decrypt</button>
+            </form>
+          </section>
+        </main>
       </body>
     </html>
   `;
