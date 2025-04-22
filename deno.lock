@@ -792,7 +792,6 @@
         "npm:@types/node@^22.14.0",
         "npm:crypto-js@^4.2.0",
         "npm:express@^5.1.0",
-        "npm:lit-html@^3.3.0",
         "npm:typescript@^5.8.3"
       ]
     }
