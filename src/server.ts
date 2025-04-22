@@ -88,6 +88,12 @@ router
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
+  .get("/rsa", ctx => {
+    // Pass custom input to the about page
+    const html = rsaPage.render();
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  });
 
 // Use router middleware
 app.use(router.routes());
