@@ -3,6 +3,13 @@
     "dev": "deno run --watch main.ts"
   },
   "imports": {
-    "crypto-js": "npm:crypto-js"
+    "@oak/oak": "jsr:@oak/oak@^17.1.4",
+    "crypto-js": "npm:crypto-js",
+    "expresss": "npm:express"
+  },
+  "lint": {
+    "exclude": [
+      "src/server.ts"
+    ]
   }
 }
