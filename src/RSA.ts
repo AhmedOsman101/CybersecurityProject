@@ -52,14 +52,14 @@ export function generateRSAKeys() {
 }
 
 // Function to encrypt a message
-function encrypt(message: string, publicKey: PublicKey): bigint {
+export function encrypt(message: string, publicKey: PublicKey): bigint {
   const messageBuffer = Buffer.from(message, "utf-8");
   const messageBigInt = BigInt(`0x${messageBuffer.toString("hex")}`);
   return modPower(messageBigInt, publicKey.e, publicKey.n); // c = m^e (mod n)
 }
 
 // Function to decrypt a ciphertext
-function decrypt(ciphertext: bigint, privateKey: PrivateKey): string {
+export function decrypt(ciphertext: bigint, privateKey: PrivateKey): string {
   const decryptedBigInt = modPower(ciphertext, privateKey.d, privateKey.n); // m = c^d (mod n)
   const decryptedHex = decryptedBigInt.toString(16);
   // Pad with leading zero if the hex string has an odd length

@@ -49,7 +49,7 @@ function preprocess(message: string): Buffer {
  * @param message - The input string to hash
  * @returns The SHA-1 digest as a hex string
  */
-function sha1(message: string): string {
+export function sha1(message: string): string {
   // Preprocess message into padded 512-bit (64-byte) chunks
   const paddedBuf: Buffer = preprocess(message);
   // Initialize hash state variables (big-endian constants)

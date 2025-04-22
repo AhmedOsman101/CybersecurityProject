@@ -4,7 +4,7 @@ import CryptoJS from "crypto-js";
 import { input, toHexString } from "./utils.ts";
 
 // Encrypt function returning Buffer
-function AesEncrypt(text: string, key: Buffer): string {
+export function AesEncrypt(text: string, key: Buffer): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
   const encrypted = CryptoJS.AES.encrypt(text, keyWordArray, {
     mode: CryptoJS.mode.ECB,
@@ -14,7 +14,7 @@ function AesEncrypt(text: string, key: Buffer): string {
 }
 
 // Decrypt function returning string
-function AesDecrypt(encrypted: string, key: Buffer): string {
+export function AesDecrypt(encrypted: string, key: Buffer): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
   const decrypted = CryptoJS.AES.decrypt(encrypted, keyWordArray, {
     mode: CryptoJS.mode.ECB,
@@ -28,7 +28,7 @@ export async function AesTest() {
   try {
     console.log("# ---- AES-ECB ---- #");
 
-    // Generate a random key as Uint8Array (not Buffer)
+    // Generate a random key as Buffer
     const key = randomBytes(16);
     console.log(`Key (hex): ${toHexString(Buffer.from(key)).toUpperCase()}`);
 
