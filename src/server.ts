@@ -45,11 +45,12 @@ router
       key: "",
       encrypted: "",
       decrypted: "",
+      mode: "e",
     });
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
-  .post("/aes", async ctx => {
+  .post("/aes/encrypt", async ctx => {
     const body = await ctx.request.body.form();
 
     const text = body.get("text") || "";
@@ -71,6 +72,7 @@ router
           encrypted: "",
           decrypted: "",
           error,
+          mode: "e",
         });
         ctx.response.body = html;
         ctx.response.type = "text/html";
@@ -79,10 +81,51 @@ router
     }
 
     const encrypted = AesEncrypt(text, keyBuffer);
+
+    // Pass custom input to the about page
+    const html = aesPage.render({
+      text,
+      key,
+      encrypted,
+      decrypted: "",
+      mode: "e",
+    });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
+  .post("/aes/decrypt", async ctx => {
+    const body = await ctx.request.body.form();
+
+    const encrypted = body.get("encrypted") || "";
+    const key = body.get("key") || "";
+    const keyBuffer: Buffer = Buffer.from(key);
+    const error = !validateKey(keyBuffer);
+
+    if (error) {
+      // Pass custom input to the about page
+      const html = aesPage.render({
+        text: "",
+        key,
+        encrypted,
+        decrypted: "",
+        error,
+        mode: "d",
+      });
+      ctx.response.body = html;
+      ctx.response.type = "text/html";
+      return;
+    }
+
     const decrypted = AesDecrypt(encrypted, keyBuffer);
 
     // Pass custom input to the about page
-    const html = aesPage.render({ text, key, encrypted, decrypted });
+    const html = aesPage.render({
+      text: "",
+      key,
+      encrypted,
+      decrypted,
+      mode: "d",
+    });
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
