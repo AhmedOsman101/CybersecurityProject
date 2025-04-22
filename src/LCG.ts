@@ -23,6 +23,6 @@ function* LcgGenerator(
   }
 }
 
-export const GetLcg = (lcg: Generator<bigint>): bigint => lcg.next().value;
+export const getLcg = (lcg: Generator<bigint>): bigint => lcg.next().value;
 
 export const LCG = LcgGenerator(MODULUS, MULTIPLIER, INCREMENT, INITIAL_SEED);
