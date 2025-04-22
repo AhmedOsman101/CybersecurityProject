@@ -1,3 +1,5 @@
+import styles from "../styles.ts";
+
 type Props = {
   text: string;
   result: string;
@@ -13,20 +15,21 @@ export function render(props: Props): string {
           name="viewport"
           content="width=device-width, initial-scale=1.0" />
         <title>Cybersecurity Project - SHA-1</title>
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css" />
+        <style>${styles}</style>
+
       </head>
       <body>
-        <center>
-          <div>
-            <h1>Navigation</h1>
-            <a href="/">Homepage</a>
-            <br />
-            <a href="/aes">Use AES with ECB mode</a>
-            <br />
+        <header style="text-align: center; padding: 20px;">
+          <h1>Encryption Using SHA-1</h1>
+          <nav>
+            <p>Navigation</p>
+            <a href="/">Homepage</a><br>
+            <a href="/aes">Use AES with ECB mode</a></br>
             <a href="/rsa">Use RSA with LCG key generation</a>
-          </div>
+          </nav>
+        </header>
+
+        <center>
           <div>
             <h1>SHA-1</h1>
             <form
