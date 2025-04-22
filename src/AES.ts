@@ -3,6 +3,14 @@ import { randomBytes } from "node:crypto";
 import CryptoJS from "crypto-js";
 import { input, toHexString } from "./utils.ts";
 
+export function validateKey(key: Buffer): boolean {
+  const allowedLengths = [16, 24, 32];
+
+  const keyString = key.toString("utf8");
+
+  return allowedLengths.some(v => keyString.length === v);
+}
+
 // Encrypt function returning Buffer
 export function AesEncrypt(text: string, key: Buffer): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
