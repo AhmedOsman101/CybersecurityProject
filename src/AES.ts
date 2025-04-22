@@ -4,11 +4,9 @@ import CryptoJS from "crypto-js";
 import { input, toHexString } from "./utils.ts";
 
 export function validateKey(key: Buffer): boolean {
-  const allowedLengths = [16, 24, 32];
-
   const keyString = key.toString("utf8");
 
-  return allowedLengths.some(v => keyString.length === v);
+  return [16, 24, 32].includes(keyString.length);
 }
 
 // Encrypt function returning Buffer
