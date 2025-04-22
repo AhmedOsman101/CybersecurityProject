@@ -146,6 +146,6 @@ export async function Sha1Test() {
   } catch (error) {
     console.error(`Error: ${error}`);
   } finally {
-    console.log("# ---- SHA-1 ---- #");
+    console.log("# ---- SHA-1 ---- #\n");
   }
 }
