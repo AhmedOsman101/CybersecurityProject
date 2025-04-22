@@ -1,24 +1,26 @@
 import { Buffer } from "node:buffer";
-import * as crypto from "node:crypto"; // standard node js module,
+import { randomBytes } from "node:crypto";
+import CryptoJS from "npm:crypto-js";
 import { input, toHexString } from "./utils.ts";
 
-function AesEncrypt(text: string, key: Buffer): Buffer<ArrayBuffer> {
-  // Create cipher (ECB mode, no IV)
-  const cipher = crypto.createCipheriv("aes-128-ecb", key, null);
-  cipher.setAutoPadding(true); // Enable PKCS#7 padding
-
-  const encrypted = cipher.update(text, "utf8");
-  return Buffer.concat([encrypted, cipher.final()]);
+// Encrypt function returning Buffer
+function AesEncrypt(text: string, key: Buffer): string {
+  const keyWordArray = CryptoJS.lib.WordArray.create(key);
+  const encrypted = CryptoJS.AES.encrypt(text, keyWordArray, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return encrypted.toString();
 }
 
-function AesDecrypt(key: Buffer, encrypted: Buffer): Buffer<ArrayBuffer> {
-  // Create decipher
-  const decipher = crypto.createDecipheriv("aes-128-ecb", key, null);
-  decipher.setAutoPadding(true); // Enable PKCS#7 unpadding
-
-  // Decrypt
-  const decrypted = decipher.update(encrypted);
-  return Buffer.concat([decrypted, decipher.final()]);
+// Decrypt function returning string
+function AesDecrypt(encrypted: string, key: Buffer): string {
+  const keyWordArray = CryptoJS.lib.WordArray.create(key);
+  const decrypted = CryptoJS.AES.decrypt(encrypted, keyWordArray, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7,
+  });
+  return decrypted.toString(CryptoJS.enc.Utf8);
 }
 
 // Main AES-ECB encryption and decryption
@@ -26,22 +28,25 @@ export async function AesTest() {
   try {
     console.log("# ---- AES-ECB ---- #");
 
-    const key = crypto.randomBytes(16);
+    // Generate a random key as Uint8Array (not Buffer)
+    const key = randomBytes(16);
+    console.log(`Key (hex): ${toHexString(Buffer.from(key)).toUpperCase()}`);
 
     const plaintext = await input("Enter text to cipher (AES-ECB): ");
     console.log(`Plaintext: ${plaintext}`);
 
     // Encrypt
     const encrypted = AesEncrypt(plaintext, key);
-    const ciphertextHex = toHexString(encrypted);
+    const ciphertextHex = toHexString(Buffer.from(encrypted));
     console.log(`Ciphertext (hex): ${ciphertextHex.toUpperCase()}`);
 
     // Decrypt
-    const decrypted = AesDecrypt(key, encrypted).toString("utf8");
+    const decrypted = AesDecrypt(encrypted, key);
     console.log(`Decrypted: ${decrypted}`);
-  } catch (error) {
-    console.error(`Error: ${error}`);
+  } catch (err) {
+    const error = err as Error;
+    console.error("Error:", error);
   } finally {
-    console.log("# ---- AES-ECB ---- #");
+    console.log("# ---- AES-ECB ---- #\n");
   }
 }
