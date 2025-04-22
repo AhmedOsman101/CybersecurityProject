@@ -38,6 +38,56 @@ router
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
+  .get("/aes", ctx => {
+    // Pass custom input to the about page
+    const html = aesPage.render({
+      text: "",
+      key: "",
+      encrypted: "",
+      decrypted: "",
+    });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
+  .post("/aes", async ctx => {
+    const body = await ctx.request.body.form();
+
+    const text = body.get("text") || "";
+    let key = body.get("key");
+    let keyBuffer: Buffer;
+
+    if (!key) {
+      keyBuffer = randomBytes(16);
+      key = keyBuffer.toString("hex");
+    } else {
+      keyBuffer = Buffer.from(key);
+      const error = !validateKey(keyBuffer);
+
+      if (error) {
+        // Pass custom input to the about page
+        const html = aesPage.render({
+          text,
+          key,
+          encrypted: "",
+          decrypted: "",
+          error,
+        });
+        ctx.response.body = html;
+        ctx.response.type = "text/html";
+        return;
+      }
+
+      key = keyBuffer.toString("hex");
+    }
+
+    const encrypted = AesEncrypt(text, keyBuffer);
+    const decrypted = AesDecrypt(encrypted, keyBuffer);
+
+    // Pass custom input to the about page
+    const html = aesPage.render({ text, key, encrypted, decrypted });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
 
 // Use router middleware
 app.use(router.routes());
