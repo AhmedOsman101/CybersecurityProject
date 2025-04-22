@@ -1,48 +1,48 @@
 import { Buffer } from "node:buffer";
 import { checkPrimeSync } from "node:crypto";
-import { GetLcg, LCG } from "./LCG.ts"; // Your existing LCG implementation
+import { getLcg, LCG } from "./LCG.ts"; // Your existing LCG implementation
+import { countBits, modInverse, modPower } from "./math.ts";
+import { bigintToBuffer, input } from "./utils.ts";
 
-// Convert BigInt to Buffer for crypto module
-function bigintToBuffer(n: bigint): Buffer {
-  let hex = n.toString(16);
-  if (hex.length % 2) hex = `0${hex}`; // Pad even-length hex
-  return Buffer.from(hex, "hex");
-}
+type PublicKey = {
+  e: bigint;
+  n: bigint;
+};
+
+type PrivateKey = {
+  d: bigint;
+  n: bigint;
+};
 
 // Generate prime candidates using LCG
 function generateLCGPrime(): bigint {
   let candidate: bigint;
   do {
-    candidate = GetLcg(LCG);
+    candidate = getLcg(LCG);
     // Ensure minimum size and oddness
-    if (candidate < 65537n) continue;
+    if (candidate < 65_537n) continue;
     if (candidate % 2n === 0n) candidate += 1n;
   } while (!checkPrimeSync(bigintToBuffer(candidate), { checks: 5 }));
   return candidate;
 }
 
-// Modular inverse using Extended Euclidean Algorithm
-function modInverse(a: bigint, m: bigint): bigint {
-  let [oldR, r] = [a, m];
-  let [oldS, s] = [1n, 0n];
-  while (r !== 0n) {
-    const quotient = oldR / r;
-    [oldR, r] = [r, oldR - quotient * r];
-    [oldS, s] = [s, oldS - quotient * s];
-  }
-  return oldR === 1n ? (oldS + m) % m : 1n;
-}
-
 // Generate RSA keys using LCG primes
 export function generateRSAKeys() {
-  const p = generateLCGPrime();
-  let q = generateLCGPrime();
+  // 1. Key Generation
+  const p: bigint = generateLCGPrime();
+  let q: bigint = generateLCGPrime();
   while (p === q) q = generateLCGPrime(); // Ensure distinct primes
 
-  const n = p * q;
-  const phi = (p - 1n) * (q - 1n);
-  const e = 65537n;
-  const d = modInverse(e, phi);
+  // 2. Calculate n (Modulus)
+  const n: bigint = p * q; // n = p * q
+  // 3. Calculate phi(n) (Euler's Totient Function)
+  const phi: bigint = (p - 1n) * (q - 1n); // φ(n) = (p-1)(q-1)
+
+  // 4. Choose public exponent e (must be 1 < e < phi_n and gcd(e, phi_n) = 1)
+  const e: bigint = 65_537n;
+
+  // 5. Calculate private exponent d (Modular Inverse of e mod phi_n)
+  const d: bigint = modInverse(e, phi); // d * e ≡ 1 (mod phi_n)
 
   return {
     publicKey: { e, n },
@@ -51,24 +51,48 @@ export function generateRSAKeys() {
   };
 }
 
-// Example usage
-const { privateKey, publicKey } = generateRSAKeys();
-console.log("Public Key:", publicKey);
-console.log("Private Key:", privateKey);
+// Function to encrypt a message
+function encrypt(message: string, publicKey: PublicKey): bigint {
+  const messageBuffer = Buffer.from(message, "utf-8");
+  const messageBigInt = BigInt(`0x${messageBuffer.toString("hex")}`);
+  return modPower(messageBigInt, publicKey.e, publicKey.n); // c = m^e (mod n)
+}
 
-// console.log("Original Message:", new TextDecoder().decode(message));
-// console.log("Encrypted:", Buffer.from(encrypted).toString("base64"));
-// console.log("Decrypted:", new TextDecoder().decode(decrypted));
+// Function to decrypt a ciphertext
+function decrypt(ciphertext: bigint, privateKey: PrivateKey): string {
+  const decryptedBigInt = modPower(ciphertext, privateKey.d, privateKey.n); // m = c^d (mod n)
+  const decryptedHex = decryptedBigInt.toString(16);
+  // Pad with leading zero if the hex string has an odd length
+  const paddedHex =
+    decryptedHex.length % 2 === 0 ? decryptedHex : `0${decryptedHex}`;
+  const messageBuffer = Buffer.from(paddedHex, "hex");
+  return messageBuffer.toString("utf-8");
+}
 
-// const { privateKey, publicKey } = generateKeyPairSync("rsa", {
-//   modulusLength: 2048,
-//   publicKeyEncoding: {
-//     type: "spki",
-//     format: "pem",
-//   },
-//   privateKeyEncoding: {
-//     type: "pkcs8",
-//     format: "pem",
-//   },
-// });
-// console.log(privateKey, publicKey);
+export async function RsaTest() {
+  // --- Generate RSA keys --- //
+  const { publicKey, privateKey, primes } = generateRSAKeys();
+
+  console.log("RSA Parameters:");
+  console.log(`  p: ${primes.p}, bitcount: ${countBits(primes.p)}`);
+  console.log(`  q: ${primes.q}, bitcount: ${countBits(primes.q)}`);
+  console.log(`  n (modulus): ${publicKey.n}`); // Correct n
+  console.log(`  e (public exp): ${publicKey.e}`);
+  console.log(`  d (private exp): ${privateKey.d}`);
+  console.log("---");
+
+  // --- Encryption/Decryption --- //
+
+  // Get message from the user
+  const message = await input("Enter the message to encrypt (RSA): ");
+  console.log("Original Message:", message);
+
+  // Encrypt the message
+  const ciphertext = encrypt(message, publicKey);
+  console.log(`Ciphertext (c): ${ciphertext}`);
+
+  // Decrypt the ciphertext
+  const decryptedMessage = decrypt(ciphertext, privateKey);
+  console.log(`Decrypted message (m): ${decryptedMessage}`);
+  console.log("# ---- RSA ---- #");
+}
