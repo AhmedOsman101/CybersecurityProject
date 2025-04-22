@@ -2,6 +2,7 @@
   "version": "4",
   "specifiers": {
     "npm:@types/node@^22.14.0": "22.14.1",
+    "npm:crypto-js@*": "4.2.0",
     "npm:crypto-js@^4.2.0": "4.2.0",
     "npm:typescript@^5.8.3": "5.8.3"
   },
@@ -23,6 +24,9 @@
     }
   },
   "workspace": {
+    "dependencies": [
+      "npm:crypto-js@*"
+    ],
     "packageJson": {
       "dependencies": [
         "npm:@types/node@^22.14.0",

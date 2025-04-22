@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 import { randomBytes } from "node:crypto";
-import CryptoJS from "npm:crypto-js";
+import CryptoJS from "crypto-js";
 import { input, toHexString } from "./utils.ts";
 
 // Encrypt function returning Buffer
