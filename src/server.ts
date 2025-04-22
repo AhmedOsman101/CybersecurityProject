@@ -1,8 +1,8 @@
-import { Application, Router } from "@oak/oak";
 import { Buffer } from "node:buffer";
-import { randomBytes } from "node:crypto";
+import { Application, Router } from "@oak/oak";
 import { AesDecrypt, AesEncrypt, validateKey } from "./AES.ts";
 import { sha1 } from "./SHA1.ts";
+import { generateRandomKey } from "./utils.ts";
 
 // Initialize Oak application and router
 const app = new Application();
@@ -57,8 +57,8 @@ router
     let keyBuffer: Buffer;
 
     if (!key) {
-      keyBuffer = randomBytes(16);
-      key = keyBuffer.toString("hex");
+      key = generateRandomKey(16);
+      keyBuffer = Buffer.from(key);
     } else {
       keyBuffer = Buffer.from(key);
       const error = !validateKey(keyBuffer);
@@ -76,8 +76,6 @@ router
         ctx.response.type = "text/html";
         return;
       }
-
-      key = keyBuffer.toString("hex");
     }
 
     const encrypted = AesEncrypt(text, keyBuffer);

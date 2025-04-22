@@ -1,4 +1,5 @@
 import { Buffer } from "node:buffer"; // Node.js readline module for terminal input
+import { randomInt } from "node:crypto";
 import process from "node:process";
 import { createInterface } from "node:readline";
 
@@ -32,4 +33,29 @@ export function bigintToBuffer(n: bigint): Buffer {
   let hex = n.toString(16);
   if (hex.length % 2) hex = `0${hex}`; // Pad even-length hex
   return Buffer.from(hex, "hex");
+}
+
+/**
+ * Generates a random string of a specified length.
+ * The string includes a mix of lowercase letters, uppercase letters, and numbers.
+ *
+ * @param length The desired length of the string.
+ * @returns A randomly generated string.
+ */
+export function generateRandomKey(length: number): string {
+  // Define the character sets to use for the string
+  const lowerCaseChars = "abcdefghijklmnopqrstuvwxyz";
+  const upperCaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numberChars = "0123456789";
+
+  // Combine all character sets into one string
+  const allChars = lowerCaseChars + upperCaseChars + numberChars;
+
+  let password = "";
+  // Generate the string by randomly selecting characters from the combined set
+  for (let i = 0; i < length; i++) {
+    password += allChars[randomInt(0, allChars.length)];
+  }
+
+  return password;
 }
