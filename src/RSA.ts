@@ -70,6 +70,8 @@ export function decrypt(ciphertext: bigint, privateKey: PrivateKey): string {
 }
 
 export async function RsaTest() {
+  console.log("# ---- RSA ---- #");
+
   // --- Generate RSA keys --- //
   const { publicKey, privateKey, primes } = generateRSAKeys();
 
