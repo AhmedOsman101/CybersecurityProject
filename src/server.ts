@@ -22,7 +22,22 @@ router
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
-  
+  .get("/sha-1", ctx => {
+    // Pass custom input to the about page
+    const html = sha1Page.render({ text: "", result: "" });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
+  .post("/sha-1", async ctx => {
+    const body = await ctx.request.body.form();
+
+    const text = body.get("text") || "";
+    const result = sha1(text);
+
+    const html = sha1Page.render({ text, result });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
 
 // Use router middleware
 app.use(router.routes());
