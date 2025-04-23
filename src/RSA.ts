@@ -44,14 +44,14 @@ export function generateRSAKeys(): RsaKeyComponents {
 }
 
 // Function to encrypt a message
-export function encrypt(message: string, publicKey: PublicKey): bigint {
+export function RsaEncrypt(message: string, publicKey: PublicKey): bigint {
   const messageBuffer = Buffer.from(message, "utf-8");
   const messageBigInt = BigInt(`0x${messageBuffer.toString("hex")}`);
   return modPower(messageBigInt, publicKey.e, publicKey.n); // c = m^e (mod n)
 }
 
 // Function to decrypt a ciphertext
-export function decrypt(ciphertext: bigint, privateKey: PrivateKey): string {
+export function RsaDecrypt(ciphertext: bigint, privateKey: PrivateKey): string {
   const decryptedBigInt = modPower(ciphertext, privateKey.d, privateKey.n); // m = c^d (mod n)
   const decryptedHex = decryptedBigInt.toString(16);
   // Pad with leading zero if the hex string has an odd length
@@ -83,11 +83,11 @@ export async function RsaTest() {
   console.log("Original Message:", message);
 
   // Encrypt the message
-  const ciphertext = encrypt(message, publicKey);
+  const ciphertext = RsaEncrypt(message, publicKey);
   console.log("Ciphertext (base64):", bigintToBase64(ciphertext));
 
   // Decrypt the ciphertext
-  const decryptedMessage = decrypt(ciphertext, privateKey);
+  const decryptedMessage = RsaDecrypt(ciphertext, privateKey);
   console.log(`Decrypted message (m): ${decryptedMessage}`);
   console.log("# ---- RSA ---- #");
 }
