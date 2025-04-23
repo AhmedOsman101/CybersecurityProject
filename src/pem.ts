@@ -8,6 +8,7 @@ function ab2b64(ab: ArrayBuffer): string {
 }
 /** Insert `\n` every 64 chars */
 function wrap64(b64: string): string {
+  // biome-ignore lint/style/noNonNullAssertion: <explanation>
   return b64.match(/.{1,64}/g)!.join("\n");
 }
 

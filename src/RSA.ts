@@ -1,12 +1,10 @@
 import { Buffer } from "node:buffer";
 import { checkPrimeSync } from "node:crypto";
+import type { PrivateKey, PublicKey, RsaKeyComponents } from "./index.d.ts";
 import { getLcg, LCG } from "./LCG.ts"; // Your existing LCG implementation
-import { countBits, modInverse, modPower } from "./math.ts";
+import { modInverse, modPower } from "./math.ts";
 import { keysToPem } from "./pem.ts";
 import { bigintToBuffer, input } from "./utils.ts";
-import type { RsaKeyComponents, PublicKey, PrivateKey } from "./index.d.ts";
-
-
 
 // Generate prime candidates using LCG
 function generateLCGPrime(): bigint {
