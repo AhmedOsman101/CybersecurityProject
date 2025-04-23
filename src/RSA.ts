@@ -2,23 +2,11 @@ import { Buffer } from "node:buffer";
 import { checkPrimeSync } from "node:crypto";
 import { getLcg, LCG } from "./LCG.ts"; // Your existing LCG implementation
 import { countBits, modInverse, modPower } from "./math.ts";
+import { keysToPem } from "./pem.ts";
 import { bigintToBuffer, input } from "./utils.ts";
+import type { RsaKeyComponents, PublicKey, PrivateKey } from "./index.d.ts";
 
-type PublicKey = {
-  e: bigint;
-  n: bigint;
-};
 
-type PrivateKey = {
-  d: bigint;
-  n: bigint;
-};
-
-type RsaKeyComponents = {
-  publicKey: PublicKey;
-  privateKey: PrivateKey;
-  primes: { p: bigint; q: bigint };
-};
 
 // Generate prime candidates using LCG
 function generateLCGPrime(): bigint {
@@ -80,13 +68,15 @@ export async function RsaTest() {
 
   // --- Generate RSA keys --- //
   const { publicKey, privateKey, primes } = generateRSAKeys();
+  const { publicKeyPem, privateKeyPem } = await keysToPem({
+    publicKey,
+    privateKey,
+    primes,
+  });
 
-  console.log("RSA Parameters:");
-  console.log(`  p: ${primes.p}, bitcount: ${countBits(primes.p)}`);
-  console.log(`  q: ${primes.q}, bitcount: ${countBits(primes.q)}`);
-  console.log(`  n (modulus): ${publicKey.n}`); // Correct n
-  console.log(`  e (public exp): ${publicKey.e}`);
-  console.log(`  d (private exp): ${privateKey.d}`);
+  console.log("RSA keys:");
+  console.log(publicKeyPem, "\n");
+  console.log(privateKeyPem, "\n");
   console.log("---");
 
   // --- Encryption/Decryption --- //
