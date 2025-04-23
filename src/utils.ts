@@ -78,6 +78,7 @@ export function ab2b64(ab: ArrayBuffer): string {
   return Buffer.from(new Uint8Array(ab)).toString("base64");
 }
 
+/** Convert a BigInt to standard Base-64 URL string */
 export function toBase64Url(n: bigint): string {
   let hex = n.toString(16);
   if (hex.length % 2 === 1) hex = `0${hex}`; // ensure even length
@@ -95,4 +96,27 @@ export function bigintToBase64(x: bigint): string {
 
   // 3) Buffer -> Base-64
   return buf.toString("base64");
+}
+
+/** Convert a Base-64 string to a BigInt */
+export function base64ToBigInt(base64: string): bigint {
+  if (!base64 || typeof base64 !== "string") {
+    throw new Error("Invalid Base-64 string: Input is empty or not a string");
+  }
+  try {
+    // Validate Base-64 format (standard Base-64: A-Z, a-z, 0-9, +, /, =)
+    if (!base64.match(/^[A-Za-z0-9+/=]+$/)) {
+      throw new Error("Invalid Base-64 string: Contains invalid characters");
+    }
+    const buf = Buffer.from(base64, "base64");
+    const hex = buf.toString("hex");
+    if (!hex) {
+      throw new Error("Invalid Base-64 string: Decodes to empty buffer");
+    }
+    return BigInt(`0x${hex}`);
+  } catch (error) {
+    throw new Error(
+      `Failed to convert Base-64 to BigInt: ${(error as Error).message}`
+    );
+  }
 }
