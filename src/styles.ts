@@ -949,6 +949,27 @@ form {
   flex-direction: column;
   gap: 8px;
 }
+.rsa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.rsa-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.full-width {
+  grid-column: 1 / -1;
+}
+button-group {
+  display: flex;
+  gap: 10px;
+}
 `;
 
 export default styles;

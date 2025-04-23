@@ -1,67 +1,85 @@
-import styles from "../styles.ts";
+import Body from "./components/body.ts";
+import Navbar from "./components/navbar.ts";
 
 type Props = {
   text: string;
-  key: string;
+  publicKey: string;
+  privateKey: string;
   encrypted: string;
   decrypted: string;
   error?: boolean;
-  mode: "e" | "d";
+  mode: "e" | "d" | "g";
 };
 
-export function render(props: Props): string {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0" />
-        <title>Cybersecurity Project - RSA-LCG</title>
-        <style>${styles}</style>
-      </head>
-      <body>
-        <center>
-          <div>
-            <h1>Encrypt/Decrypt Text with RSA (LCG key generation)</h1>
-            <p>Navigation</p>
-            <a href="/">Homepage</a>
-            <br>
-            <a href="/sha-1">Use SHA-1</a>
-            <br>
-            <a href="/aes">Use AES with ECB mode</a>
-          </div>
-          <div>
-            <h1>RSA-LCG</h1>
-            <form action="/rsa/encrypt" method="post">
-              <label for="text">Text:</label>
-              <input type="text" id="text" name="text" required value="${props.text}" />
-              <br />
-              <label for="key">Enter AES Key (16, 24, or 32 characters):</label>
-              <textarea id="key" name="key" rows="2">${props.key}</textarea>
-              <span style="color: red; display: ${
-                props.error ? "block" : "none"
-              };">
-                Key must be 16, 24, or 32 characters long.
-              </span>
-              <br />
-              <label for="text">Encrypted Text:</label>
-              <textarea id="encrypted" name="encrypted" rows="2" readonly>${
-                props.encrypted
-              }</textarea>
-              <br />
-              <label for="text">Decrypted Text:</label>
-              <textarea id="decrypted" name="decrypted" rows="2" readonly>${
-                props.decrypted
-              }</textarea>
-              <br />
-              <button type="submit">Process</button>
-            </form>
-            <br />
-          </div>
-        </center>
-      </body>
-    </html>
+export function render({
+  text,
+  publicKey,
+  privateKey,
+  encrypted,
+  decrypted,
+  error,
+  mode,
+}: Props): string {
+  const links = [
+    {
+      url: "/",
+      label: "Homepage",
+    },
+    {
+      url: "/sha-1",
+      label: "Use SHA-1",
+    },
+    {
+      url: "/aes",
+      label: "Use AES with ECB mode",
+    },
+  ];
+  const slot = `
+  ${Navbar("RSA Encryption/Decryption with LCG Key Generation", links)}
+  <main class="rsa-grid">
+    <!-- Key display -->
+    <div class="full-width">
+      <h2>Keys</h2>
+    </div>
+    <div>
+      <label for="public-key">Public Key:</label>
+      <textarea id="public-key" readonly rows="4">${publicKey}</textarea>
+    </div>
+    <div>
+      <label for="private-key">Private Key:</label>
+      <textarea id="private-key" readonly rows="4">${privateKey}</textarea>
+    </div>
+    <div class="full-width">
+      <button type="button" onclick="location.href='/rsa/generate'">Generate Keys</button>
+    </div>
+
+    <!-- Encryption section -->
+    <div>
+      <h2>Encrypt</h2>
+      <label for="rsa-text">Plaintext:</label>
+      <textarea id="rsa-text" name="text" rows="4" placeholder="Enter text to encrypt">${mode === "e" ? text : ""}</textarea>
+      <button style="width: 200%;" type="button" onclick="document.forms.encryptForm.submit()">Encrypt</button>
+    </div>
+    <div>
+      <h2>Ciphertext</h2>
+      <label for="rsa-encrypted">Encrypted:</label>
+      <textarea id="rsa-encrypted" name="encrypted" readonly rows="4">${mode === "e" ? encrypted : ""}</textarea>
+    </div>
+
+    <!-- Decryption section -->
+    <div>
+      <h2>Decrypt</h2>
+      <label for="rsa-cipher">Cipher Text:</label>
+      <textarea id="rsa-cipher" name="encrypted" rows="4" placeholder="Enter ciphertext">${mode === "d" ? encrypted : ""}</textarea>
+      <button style="width: 200%;" type="button" onclick="document.forms.decryptForm.submit()">Decrypt</button>
+    </div>
+    <div>
+      <h2>Plaintext</h2>
+      <label for="rsa-decrypted">Decrypted:</label>
+      <textarea id="rsa-decrypted" name="decrypted" readonly rows="4">${mode === "d" ? decrypted : ""}</textarea>
+    </div>
+  </main>
   `;
+
+  return Body("Cybersecurity Project - RSA with LCG", slot);
 }
