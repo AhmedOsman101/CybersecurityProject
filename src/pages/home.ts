@@ -1,25 +1,24 @@
-import styles from "../styles.ts";
+import Body from "./components/body.ts";
+import Navbar from "./components/navbar.ts";
 
 export function render(): string {
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Cybersecurity Project</title>
-      <style>${styles}</style>
-    </head>
-    <body>
-      <header style="text-align: center; padding: 20px;">
-          <h1>Encryption/Decryption Tools</h1>
-          <nav>
-            <p>Welcome to our homepage!</p>
-            <a href="/sha-1">Use SHA-1</a><br>
-            <a href="/aes">Use AES with ECB mode</a></br>
-            <a href="/rsa">Use RSA with LCG key generation</a>
-          </nav>
-        </header> 
-    </body>
-    </html>`;
+  const links = [
+    {
+      url: "/sha-1",
+      label: "Use SHA-1",
+    },
+    {
+      url: "/aes",
+      label: "Use AES with ECB mode",
+    },
+    {
+      url: "/rsa",
+      label: "Use RSA with LCG key generation",
+    },
+  ];
+
+  return Body(
+    "Cybersecurity Project",
+    Navbar("Encryption/Decryption Tools", links)
+  );
 }

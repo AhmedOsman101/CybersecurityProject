@@ -890,6 +890,16 @@ body>footer {
   margin: 0 auto;
   padding: 20px;
 }
+header {
+  text-align: center;
+  padding: 20px;
+}
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 10px;
+}
 .column {
   flex: 1;
   padding: 20px;
@@ -917,6 +927,27 @@ textarea {
   .container {
     flex-direction: column;
   }
+}
+
+/* one-column panel layout */
+.sha-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.panel {
+  padding: 16px;
+}
+.panel h1 {
+  margin-top: 0;
+  text-align: center;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 `;
 
