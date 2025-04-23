@@ -51,13 +51,13 @@ export function generateRandomKey(length: number): string {
   // Combine all character sets into one string
   const allChars = lowerCaseChars + upperCaseChars + numberChars;
 
-  let password = "";
+  let key = "";
   // Generate the string by randomly selecting characters from the combined set
   for (let i = 0; i < length; i++) {
-    password += allChars[randomInt(0, allChars.length)];
+    key += allChars[randomInt(0, allChars.length)];
   }
 
-  return password;
+  return key;
 }
 
 export function base64UrlToBigInt(b64url: string): bigint {
