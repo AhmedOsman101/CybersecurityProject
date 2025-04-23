@@ -2,23 +2,23 @@ import Body from "./components/body.ts";
 import Navbar from "./components/navbar.ts";
 
 type Props = {
-  text: string;
+  message: string;
   publicKey: string;
   privateKey: string;
   encrypted: string;
   decrypted: string;
-  error?: boolean;
   mode: "e" | "d" | "g";
+  error?: boolean;
 };
 
 export function render({
-  text,
+  message,
   publicKey,
   privateKey,
   encrypted,
   decrypted,
-  error,
   mode,
+  error,
 }: Props): string {
   const links = [
     {
@@ -43,41 +43,46 @@ export function render({
     </div>
     <div>
       <label for="public-key">Public Key:</label>
-      <textarea id="public-key" readonly rows="4">${publicKey}</textarea>
+      <textarea id="public-key" name="publicKey" readonly rows="7">${publicKey}</textarea>
     </div>
     <div>
       <label for="private-key">Private Key:</label>
-      <textarea id="private-key" readonly rows="4">${privateKey}</textarea>
+      <textarea id="private-key" name="privateKey" readonly rows="7">${privateKey}</textarea>
     </div>
     <div class="full-width">
       <button type="button" onclick="location.href='/rsa/generate'">Generate Keys</button>
     </div>
+    <span class="full-width error ${error ? "visible" : ""}">
+      You must Generate keys first to encrypt or decrypt text
+    </span>
 
     <!-- Encryption section -->
-    <div>
+    <form action="/rsa/encrypt" method="post">
       <h2>Encrypt</h2>
+
+      <input type="hidden" name="publicKey" value="${publicKey}">
+      <input type="hidden" name="privateKey" value="${privateKey}">
       <label for="rsa-text">Plaintext:</label>
-      <textarea id="rsa-text" name="text" rows="4" placeholder="Enter text to encrypt">${mode === "e" ? text : ""}</textarea>
-      <button style="width: 200%;" type="button" onclick="document.forms.encryptForm.submit()">Encrypt</button>
-    </div>
-    <div>
+      <textarea required id="rsa-text" name="message" rows="4" placeholder="Enter text to encrypt">${mode === "e" ? message : ""}</textarea>
+      <button type="submit">Encrypt</button>
       <h2>Ciphertext</h2>
       <label for="rsa-encrypted">Encrypted:</label>
       <textarea id="rsa-encrypted" name="encrypted" readonly rows="4">${mode === "e" ? encrypted : ""}</textarea>
-    </div>
+    </form>
 
     <!-- Decryption section -->
-    <div>
+    <form action="/rsa/decrypt" method="post">
       <h2>Decrypt</h2>
+
+      <input type="hidden" name="publicKey" value="${publicKey}">
+      <input type="hidden" name="privateKey" value="${privateKey}">
       <label for="rsa-cipher">Cipher Text:</label>
-      <textarea id="rsa-cipher" name="encrypted" rows="4" placeholder="Enter ciphertext">${mode === "d" ? encrypted : ""}</textarea>
-      <button style="width: 200%;" type="button" onclick="document.forms.decryptForm.submit()">Decrypt</button>
-    </div>
-    <div>
+      <textarea required id="rsa-cipher" name="encrypted" rows="4" placeholder="Enter ciphertext">${mode === "d" ? encrypted : ""}</textarea>
+      <button type="submit">Decrypt</button>
       <h2>Plaintext</h2>
       <label for="rsa-decrypted">Decrypted:</label>
-      <textarea id="rsa-decrypted" name="decrypted" readonly rows="4">${mode === "d" ? decrypted : ""}</textarea>
-    </div>
+      <textarea required id="rsa-decrypted" name="decrypted" readonly rows="4">${mode === "d" ? decrypted : ""}</textarea>
+    </form>
   </main>
   `;
 
