@@ -53,7 +53,7 @@ export function RsaEncrypt(message: string, publicKey: PublicKey): bigint {
 // Function to decrypt a ciphertext
 export function RsaDecrypt(ciphertext: bigint, privateKey: PrivateKey): string {
   const decryptedBigInt = modPower(ciphertext, privateKey.d, privateKey.n); // m = c^d (mod n)
-  const decryptedHex = decryptedBigInt.toString(16);
+  const decryptedHex = decryptedBigInt.toString(16); // 16 => hex
   // Pad with leading zero if the hex string has an odd length
   const paddedHex =
     decryptedHex.length % 2 === 0 ? decryptedHex : `0${decryptedHex}`;
