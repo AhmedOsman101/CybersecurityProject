@@ -1,9 +1,9 @@
 {
   "tasks": {
     "dev": "deno run -A --watch src/server.ts",
-    "compile": "deno compile --allow-all -o bin/main.out main.ts",
-    "compile-windows": "deno compile --allow-all -o bin/main.exe main.ts",
-    "start": "deno run -A main.ts"
+    "cli": "deno run -A main.ts",
+    "compile-linux": "deno compile --allow-all -o bin/main.out main.ts && deno compile --allow-all -o bin/server.out src/server.ts",
+    "compile-windows": "deno compile --allow-all -o bin/main.exe main.ts && deno compile --allow-all -o bin/server.exe src/server.ts"
   },
   "imports": {
     "@oak/oak": "jsr:@oak/oak@^17.1.4",

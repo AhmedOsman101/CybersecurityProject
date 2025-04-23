@@ -8,14 +8,3 @@ language-servers = [
   # ] },
   "deno-lsp",
 ]
-
-[[language]]
-name = "javascript"
-auto-format = false
-language-servers = [
-  "biome",
-  { name = "typescript-language-server", except-features = [
-    "format",
-  ] },
-  "deno-lsp",
-]
