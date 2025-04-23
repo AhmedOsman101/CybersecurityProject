@@ -4,7 +4,7 @@ import type { PrivateKey, PublicKey, RsaKeyComponents } from "./index.d.ts";
 import { getLcg, LCG } from "./LCG.ts"; // Your existing LCG implementation
 import { modInverse, modPower } from "./math.ts";
 import { keysToPem } from "./pem.ts";
-import { bigintToBuffer, input } from "./utils.ts";
+import { bigintToBase64, bigintToBuffer, input } from "./utils.ts";
 
 // Generate prime candidates using LCG
 function generateLCGPrime(): bigint {
@@ -75,7 +75,6 @@ export async function RsaTest() {
   console.log("RSA keys:");
   console.log(publicKeyPem, "\n");
   console.log(privateKeyPem, "\n");
-  console.log("---");
 
   // --- Encryption/Decryption --- //
 
@@ -85,7 +84,7 @@ export async function RsaTest() {
 
   // Encrypt the message
   const ciphertext = encrypt(message, publicKey);
-  console.log(`Ciphertext (c): ${ciphertext}`);
+  console.log("Ciphertext (base64):", bigintToBase64(ciphertext));
 
   // Decrypt the ciphertext
   const decryptedMessage = decrypt(ciphertext, privateKey);

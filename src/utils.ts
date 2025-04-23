@@ -59,3 +59,40 @@ export function generateRandomKey(length: number): string {
 
   return password;
 }
+
+export function base64UrlToBigInt(b64url: string): bigint {
+  // Base64URL → Base64
+  const b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+  // Pad with “=” to multiple of 4
+  const pad = b64.length % 4 ? "=".repeat(4 - (b64.length % 4)) : "";
+  const bin = atob(b64 + pad);
+  // Hexify
+  const hex = Array.from(bin, c =>
+    c.charCodeAt(0).toString(16).padStart(2, "0")
+  ).join("");
+  return BigInt(`0x${hex}`);
+}
+
+/** Convert ArrayBuffer -> Base64 string */
+export function ab2b64(ab: ArrayBuffer): string {
+  return Buffer.from(new Uint8Array(ab)).toString("base64");
+}
+
+export function toBase64Url(n: bigint): string {
+  let hex = n.toString(16);
+  if (hex.length % 2 === 1) hex = `0${hex}`; // ensure even length
+  return Buffer.from(hex, "hex").toString("base64url");
+}
+
+/** Convert a BigInt to standard Base-64 string */
+export function bigintToBase64(x: bigint): string {
+  // 1) BigInt -> hex (no "0x"), pad to even length
+  let hex = x.toString(16);
+  if (hex.length % 2) hex = `0${hex}`;
+
+  // 2) hex -> Buffer (byte array)
+  const buf = Buffer.from(hex, "hex");
+
+  // 3) Buffer -> Base-64
+  return buf.toString("base64");
+}
