@@ -4,7 +4,8 @@
   },
   "imports": {
     "@oak/oak": "jsr:@oak/oak@^17.1.4",
+    "@types/node-forge": "npm:@types/node-forge@^1.3.11",
     "crypto-js": "npm:crypto-js",
-    "expresss": "npm:express"
+    "node-forge": "npm:node-forge@^1.3.1"
   }
 }
