@@ -3,9 +3,9 @@ name = "typescript"
 auto-format = false
 language-servers = [
   "biome",
-  # { name = "typescript-language-server", except-features = [
-  #   "format",
-  # ] },
+  { name = "typescript-language-server", except-features = [
+    "format",
+  ] },
   "deno-lsp",
 ]
 
