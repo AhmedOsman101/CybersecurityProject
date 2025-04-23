@@ -1,8 +1,10 @@
 import { Buffer } from "node:buffer";
 import { Application, Router } from "@oak/oak";
 import { AesDecrypt, AesEncrypt, validateKey } from "./AES.ts";
+import { keysToPem, pemToComponents } from "./pem.ts";
+import { generateRSAKeys, RsaDecrypt, RsaEncrypt } from "./RSA.ts";
 import { sha1 } from "./SHA1.ts";
-import { generateRandomKey } from "./utils.ts";
+import { base64ToBigInt, bigintToBase64, generateRandomKey } from "./utils.ts";
 
 // Initialize Oak application and router
 const app = new Application();
@@ -132,15 +134,111 @@ router
   .get("/rsa", ctx => {
     // Pass custom input to the about page
     const html = rsaPage.render({
-      text: "",
-      key: "",
+      message: "",
+      publicKey: "",
+      privateKey: "",
       encrypted: "",
+      decrypted: "",
+      mode: "g",
+    });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
+  .get("/rsa/generate", async ctx => {
+    const { publicKey, privateKey, primes } = generateRSAKeys();
+    const { publicKeyPem, privateKeyPem } = await keysToPem({
+      publicKey,
+      privateKey,
+      primes,
+    });
+
+    // Pass custom input to the about page
+    const html = rsaPage.render({
+      message: "",
+      publicKey: publicKeyPem,
+      privateKey: privateKeyPem,
+      encrypted: "",
+      decrypted: "",
+      mode: "g",
+    });
+    ctx.response.body = html;
+    ctx.response.type = "text/html";
+  })
+  .post("/rsa/encrypt", async ctx => {
+    const body = await ctx.request.body.form();
+
+    const message = body.get("message") || "";
+    const publicKeyPem = body.get("publicKey") || "";
+    const privateKeyPem = body.get("privateKey") || "";
+
+    if (!publicKeyPem || !privateKeyPem) {
+      // Pass custom input to the about page
+      const html = rsaPage.render({
+        message,
+        publicKey: "",
+        privateKey: "",
+        encrypted: "",
+        decrypted: "",
+        mode: "e",
+        error: true,
+      });
+      ctx.response.body = html;
+      ctx.response.type = "text/html";
+      return;
+    }
+
+    const { publicKey } = await pemToComponents(publicKeyPem, privateKeyPem);
+
+    const encrypted = RsaEncrypt(message, publicKey);
+
+    // Pass custom input to the about page
+    const html = rsaPage.render({
+      message,
+      publicKey: publicKeyPem,
+      privateKey: privateKeyPem,
+      encrypted: bigintToBase64(encrypted),
       decrypted: "",
       mode: "e",
     });
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
+  .post("/rsa/decrypt", async ctx => {
+    const body = await ctx.request.body.form();
+
+    const encrypted = body.get("encrypted") || "";
+    const publicKeyPem = body.get("publicKey") || "";
+    const privateKeyPem = body.get("privateKey") || "";
+
+    if (!publicKeyPem || !privateKeyPem) {
+      // Pass custom input to the about page
+      const html = rsaPage.render({
+        message: "",
+        publicKey: "",
+        privateKey: "",
+        encrypted,
+        decrypted: "",
+        mode: "d",
+        error: true,
+      });
+      ctx.response.body = html;
+      ctx.response.type = "text/html";
+      return;
+    }
+
+    const { privateKey } = await pemToComponents(publicKeyPem, privateKeyPem);
+
+    const decrypted = RsaDecrypt(base64ToBigInt(encrypted), privateKey);
+
+    // Pass custom input to the about page
+    const html = rsaPage.render({
+      message: "",
+      publicKey: publicKeyPem,
+      privateKey: privateKeyPem,
+      encrypted,
+      decrypted,
+      mode: "d",
+    });
     ctx.response.body = html;
     ctx.response.type = "text/html";
   });
