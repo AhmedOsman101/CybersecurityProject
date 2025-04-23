@@ -14,6 +14,12 @@ type PrivateKey = {
   n: bigint;
 };
 
+type RsaKeyComponents = {
+  publicKey: PublicKey;
+  privateKey: PrivateKey;
+  primes: { p: bigint; q: bigint };
+};
+
 // Generate prime candidates using LCG
 function generateLCGPrime(): bigint {
   let candidate: bigint;
@@ -27,7 +33,7 @@ function generateLCGPrime(): bigint {
 }
 
 // Generate RSA keys using LCG primes
-export function generateRSAKeys() {
+export function generateRSAKeys(): RsaKeyComponents {
   // 1. Key Generation
   const p: bigint = generateLCGPrime();
   let q: bigint = generateLCGPrime();

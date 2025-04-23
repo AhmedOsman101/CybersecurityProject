@@ -10,20 +10,29 @@ export function validateKey(key: Buffer): boolean {
 }
 
 // Encrypt function returning Buffer
-export function AesEncrypt(text: string, key: Buffer): string {
+export function AesEncrypt(
+  text: string,
+  key: Buffer,
+  mode: "ecb" | "ctr" = "ecb"
+): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
+
   const encrypted = CryptoJS.AES.encrypt(text, keyWordArray, {
-    mode: CryptoJS.mode.ECB,
+    mode: mode === "ecb" ? CryptoJS.mode.ECB : CryptoJS.mode.CTR,
     padding: CryptoJS.pad.Pkcs7,
   });
   return encrypted.toString();
 }
 
 // Decrypt function returning string
-export function AesDecrypt(encrypted: string, key: Buffer): string {
+export function AesDecrypt(
+  encrypted: string,
+  key: Buffer,
+  mode: "ecb" | "ctr" = "ecb"
+): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
   const decrypted = CryptoJS.AES.decrypt(encrypted, keyWordArray, {
-    mode: CryptoJS.mode.ECB,
+    mode: mode === "ecb" ? CryptoJS.mode.ECB : CryptoJS.mode.CTR,
     padding: CryptoJS.pad.Pkcs7,
   });
   return decrypted.toString(CryptoJS.enc.Utf8);
