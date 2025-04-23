@@ -40,7 +40,7 @@ export function render({
       <h2>Encryption</h2>
       <form action="/aes/encrypt" method="post">
         <label for="encrypt-text">Input Text:</label>
-        <textarea id="encrypt-text" name="text" rows="4" placeholder="Enter text to encrypt">${mode === "e" ? text : ""}</textarea>
+        <textarea id="encrypt-text" required name="text" rows="4" placeholder="Enter text to encrypt">${mode === "e" ? text : ""}</textarea>
         <label for="encrypt-key">Encryption Key (16, 24, or 32 characters):</label>
         <textarea id="encrypt-key" name="key" rows="2" placeholder="Enter AES key">${mode === "e" ? key : ""}</textarea>
         <span class="error ${error && mode === "e" ? "visible" : ""}">
