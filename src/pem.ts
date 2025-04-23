@@ -1,21 +1,11 @@
-import { Buffer } from "node:buffer";
 import type { PublicKey, RsaKeyComponents } from "./index.d.ts";
 import { modInverse } from "./math.ts";
+import { ab2b64, base64UrlToBigInt, toBase64Url } from "./utils.ts";
 
-/** Convert ArrayBuffer → Base64 string */
-function ab2b64(ab: ArrayBuffer): string {
-  return Buffer.from(new Uint8Array(ab)).toString("base64");
-}
 /** Insert `\n` every 64 chars */
 function wrap64(b64: string): string {
   // biome-ignore lint/style/noNonNullAssertion: <explanation>
   return b64.match(/.{1,64}/g)!.join("\n");
-}
-
-function toBase64Url(n: bigint): string {
-  let hex = n.toString(16);
-  if (hex.length % 2 === 1) hex = `0${hex}`; // ensure even length
-  return Buffer.from(hex, "hex").toString("base64url");
 }
 
 /** Export an RSA public key to PEM (SPKI) */
@@ -99,4 +89,53 @@ export async function keysToPem(keys: RsaKeyComponents): Promise<{
     exportPrivateKeyPem(keys),
   ]);
   return { publicKeyPem, privateKeyPem };
+}
+
+export function pemToArrayBuffer(pem: string): ArrayBuffer {
+  // strip header/footer and line-breaks
+  const b64 = pem
+    .replace(/-----(BEGIN|END)[\w\s]+-----/g, "")
+    .replace(/\s+/g, "");
+
+  // decode Base64 to Uint8Array
+  const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return raw.buffer;
+}
+
+export async function pemToComponents(
+  publicKeyPem: string,
+  privateKeyPem: string
+): Promise<RsaKeyComponents> {
+  const spkiBuf = pemToArrayBuffer(publicKeyPem);
+  const pubKey = await crypto.subtle.importKey(
+    "spki",
+    spkiBuf,
+    { name: "RSA-OAEP", hash: "SHA-256" },
+    true,
+    ["encrypt"]
+  );
+
+  const pkcs8Buf = pemToArrayBuffer(privateKeyPem);
+  const privKey = await crypto.subtle.importKey(
+    "pkcs8",
+    pkcs8Buf,
+    { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+    true,
+    ["sign"]
+  );
+
+  const pubJwk = await crypto.subtle.exportKey("jwk", pubKey);
+  const privJwk = await crypto.subtle.exportKey("jwk", privKey);
+
+  const n = base64UrlToBigInt(pubJwk.n as string);
+  const e = base64UrlToBigInt(pubJwk.e as string);
+  const d = base64UrlToBigInt(privJwk.d as string);
+  const p = base64UrlToBigInt(privJwk.p as string);
+  const q = base64UrlToBigInt(privJwk.q as string);
+
+  return {
+    publicKey: { e, n },
+    privateKey: { d, n },
+    primes: { p, q },
+  };
 }
