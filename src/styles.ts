@@ -917,7 +917,8 @@ textarea {
   min-height: 60px;
 }
 .error {
-  color: red;
+  color: #B12132;
+  font-size: 1.1rem;
   display: none;
 }
 .error.visible {
