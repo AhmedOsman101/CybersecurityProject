@@ -12,13 +12,12 @@ export function validateKey(key: Buffer): boolean {
 // Encrypt function returning Buffer
 export function AesEncrypt(
   text: string,
-  key: Buffer,
-  mode: "ecb" | "ctr" = "ecb"
+  key: Buffer
 ): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
 
   const encrypted = CryptoJS.AES.encrypt(text, keyWordArray, {
-    mode: mode === "ecb" ? CryptoJS.mode.ECB : CryptoJS.mode.CTR,
+    mode: CryptoJS.mode.ECB,
     padding: CryptoJS.pad.Pkcs7,
   });
   return encrypted.toString();
@@ -27,12 +26,11 @@ export function AesEncrypt(
 // Decrypt function returning string
 export function AesDecrypt(
   encrypted: string,
-  key: Buffer,
-  mode: "ecb" | "ctr" = "ecb"
+  key: Buffer
 ): string {
   const keyWordArray = CryptoJS.lib.WordArray.create(key);
   const decrypted = CryptoJS.AES.decrypt(encrypted, keyWordArray, {
-    mode: mode === "ecb" ? CryptoJS.mode.ECB : CryptoJS.mode.CTR,
+    mode:  CryptoJS.mode.ECB ,
     padding: CryptoJS.pad.Pkcs7,
   });
   return decrypted.toString(CryptoJS.enc.Utf8);
