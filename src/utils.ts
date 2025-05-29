@@ -100,10 +100,10 @@ export function bigintToBase64(x: bigint): string {
 
 /** Convert a Base-64 string to a BigInt */
 export function base64ToBigInt(base64: string): bigint {
-  if (!base64 || typeof base64 !== "string") {
-    throw new Error("Invalid Base-64 string: Input is empty or not a string");
-  }
   try {
+    if (!base64 || typeof base64 !== "string") {
+      throw new Error("Invalid Base-64 string: Input is empty or not a string");
+    }
     // Validate Base-64 format (standard Base-64: A-Z, a-z, 0-9, +, /, =)
     if (!base64.match(/^[A-Za-z0-9+/=]+$/)) {
       throw new Error("Invalid Base-64 string: Contains invalid characters");
