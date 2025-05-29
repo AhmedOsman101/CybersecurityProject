@@ -1,4 +1,4 @@
-import { Buffer } from "node:buffer"; // Node.js readline module for terminal input
+import { Buffer } from "node:buffer";
 import { randomInt } from "node:crypto";
 import process from "node:process";
 import { createInterface } from "node:readline";
