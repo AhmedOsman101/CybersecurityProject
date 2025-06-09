@@ -1,6 +1,7 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@hono/hono@^4.7.11": "4.7.11",
     "jsr:@oak/commons@1": "1.0.0",
     "jsr:@oak/oak@^17.1.4": "17.1.4",
     "jsr:@std/assert@1": "1.0.12",
@@ -16,6 +17,9 @@
     "npm:path-to-regexp@^6.3.0": "6.3.0"
   },
   "jsr": {
+    "@hono/hono@4.7.11": {
+      "integrity": "52b9395e4f2448fbaf82a6bd7925d15e59f4055037e74d6c2f657f3618b11193"
+    },
     "@oak/commons@1.0.0": {
       "integrity": "49805b55603c3627a9d6235c0655aa2b6222d3036b3a13ff0380c16368f607ac",
       "dependencies": [
@@ -398,6 +402,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@hono/hono@^4.7.11",
       "jsr:@oak/oak@^17.1.4",
       "npm:crypto-js@*"
     ]
