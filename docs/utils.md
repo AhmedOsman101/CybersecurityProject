@@ -45,7 +45,7 @@ Prompt the user on the terminal and read a line of input.
 - **Parameters**
   - `prompt` (`string`): Text displayed to the user before input.
 - **Returns**
-  - `Promise<string>`: Resolves to the user’s input (without trailing newline).
+  - `Promise<string>`: Resolves to the user's input (without trailing newline).
 
 ---
 

@@ -28,7 +28,7 @@ Provides AES-ECB encryption and decryption utilities using CryptoJS, plus a simp
 
 ### `validateKey(key: Buffer): boolean`
 
-Verify that a key’s length is valid for AES (16, 24, or 32 bytes).
+Verify that a key's length is valid for AES (16, 24, or 32 bytes).
 
 - **Parameters**
   - `key` (`Buffer`): Raw key bytes.

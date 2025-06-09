@@ -55,7 +55,7 @@ Compute the modular multiplicative inverse of `a` modulo `m`, i.e. find `x` such
 
 ### `modPower(base: bigint, exp: bigint, modulus: bigint): bigint`
 
-Perform modular exponentiation: compute `(base^exp) % modulus` efficiently using the “exponentiation by squaring” method.
+Perform modular exponentiation: compute `(base^exp) % modulus` efficiently using the "exponentiation by squaring" method.
 
 - **Parameters**
   - `base` (`bigint`): The base value.

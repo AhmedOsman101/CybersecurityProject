@@ -47,7 +47,7 @@ Perform a 32-bit circular left rotation.
 Prepare the input string for SHA-1 block processing.
 
 1. Convert UTF-8 text → `Buffer`.
-2. Append `0x80` byte (single ‘1’ bit).
+2. Append `0x80` byte (single '1' bit).
 3. Pad with `0x00` bytes until length ≡ 56 mod 64.
 4. Append 8-byte big-endian length (original bit-length).
 

@@ -10,9 +10,9 @@ This module implements a Linear Congruential Generator (LCG) for producing a det
 
 ## Constants
 
-| Name           | Value                         | Type     | Description                                                                               |
-| -------------- | ----------------------------- | -------- | ----------------------------------------------------------------------------------------- |
-| `MODULUS`      | `18_446_744_073_709_551_616n` | `bigint` | The modulus $m$. Here set to $2^{64}$, a prime power.                                 |
+| Name           | Value                         | Type     | Description                                                                             |
+| -------------- | ----------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `MODULUS`      | `18_446_744_073_709_551_616n` | `bigint` | The modulus $m$. Here set to $2^{64}$, a prime power.                                   |
 | `MULTIPLIER`   | `6_364_136_223_846_793_005n`  | `bigint` | The multiplier $a$. A primitive root modulo m, per MMIX parameters (Knuth).             |
 | `INCREMENT`    | `1_442_695_040_888_963_407n`  | `bigint` | The increment $c$. Nonzero makes this a full LCG; if zero, becomes a multiplicative CG. |
 | `INITIAL_SEED` | `BigInt(Date.now())`          | `bigint` | Initial seed value in $[0, m-1]$, derived from the current timestamp in milliseconds.   |
@@ -59,7 +59,7 @@ $$
 
 - `export const LCG = LcgGenerator(MODULUS, MULTIPLIER, INCREMENT, INITIAL_SEED);`  
   **Generator instance**
-  - Preconfigured LCG using the module’s constants.
+  - Preconfigured LCG using the module's constants.
   - Can be passed into `getLcg` to produce pseudorandom outputs.
 
 ---
