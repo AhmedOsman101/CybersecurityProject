@@ -1,13 +1,12 @@
 {
   "tasks": {
-    "dev": "deno run -A --watch src/server.ts",
-    "start": "deno run -A --watch src/server.ts",
-    "cli": "deno run -A main.ts",
-    "compile-linux": "deno compile --allow-all -o bin/main.out main.ts && deno compile --allow-all -o bin/server.out src/server.ts",
-    "compile-windows": "deno compile --allow-all -o bin/main.exe main.ts && deno compile --allow-all -o bin/server.exe src/server.ts"
+    "start": "deno run --allow-net src/server.ts",
+    "dev": "deno run --allow-net --watch src/server.ts",
+    "cli": "deno run --allow-env main.ts",
+    "compile-linux": "mkdir -p bin && deno compile --allow-env -o bin/main.out main.ts && deno compile --allow-net -o bin/server.out src/server.ts",
+    "compile-windows": "mkdir -p bin && deno compile --allow-env -o bin/main --target x86_64-pc-windows-msvc main.ts && deno compile --allow-net -o bin/server --target x86_64-pc-windows-msvc src/server.ts"
   },
   "imports": {
-    "@oak/oak": "jsr:@oak/oak@^17.1.4",
     "crypto-js": "npm:crypto-js",
     "hono": "jsr:@hono/hono@^4.7.11"
   },

@@ -3,7 +3,6 @@ import { RsaTest } from "./src/rsa.ts";
 import { Sha1Test } from "./src/sha1.ts";
 
 async function main() {
-  console.log(Deno.args);
   if (Deno.args.length === 1) {
     const arg = Deno.args[0];
     switch (arg) {
