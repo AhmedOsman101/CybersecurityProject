@@ -53,11 +53,11 @@ export function sha1(message: string): string {
   // Preprocess message into padded 512-bit (64-byte) chunks
   const paddedBuf: Buffer = preprocess(message);
   // Initialize hash state variables (big-endian constants)
-  let H0 = 0x67452301;
-  let H1 = 0xefcdab89;
-  let H2 = 0x98badcfe;
-  let H3 = 0x10325476;
-  let H4 = 0xc3d2e1f0;
+  let H0 = 0x67_45_23_01;
+  let H1 = 0xef_cd_ab_89;
+  let H2 = 0x98_ba_dc_fe;
+  let H3 = 0x10_32_54_76;
+  let H4 = 0xc3_d2_e1_f0;
 
   // Process each 512-bit chunk
   for (let i = 0; i < paddedBuf.length; i += 64) {
@@ -91,16 +91,16 @@ export function sha1(message: string): string {
       // Round-based function selection and constant
       if (t <= 19) {
         f = (b & c) | (~b & d); // Ch function
-        k = 0x5a827999;
+        k = 0x5a_82_79_99;
       } else if (t <= 39) {
         f = b ^ c ^ d; // Parity
-        k = 0x6ed9eba1;
+        k = 0x6e_d9_eb_a1;
       } else if (t <= 59) {
         f = (b & c) | (b & d) | (c & d); // Maj function
-        k = 0x8f1bbcdc;
+        k = 0x8f_1b_bc_dc;
       } else {
         f = b ^ c ^ d; // Parity
-        k = 0xca62c1d6;
+        k = 0xca_62_c1_d6;
       }
 
       // Compute temp = leftrotate(a,5) + f + e + k + W[t]

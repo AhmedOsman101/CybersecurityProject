@@ -1,9 +1,9 @@
-type link = {
+type Link = {
   url: string;
   label: string;
 };
 
-function Navbar(title: string, links: link[]) {
+function Navbar(title: string, links: Link[]) {
   return `
     <header>
       <h1>${title}</h1>

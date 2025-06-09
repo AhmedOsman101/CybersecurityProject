@@ -1,9 +1,9 @@
 import { Buffer } from "node:buffer";
 import { Application, Router } from "@oak/oak";
-import { AesDecrypt, AesEncrypt, validateKey } from "./AES.ts";
+import { AesDecrypt, AesEncrypt, validateKey } from "./aes.ts";
 import { keysToPem, pemToComponents } from "./pem.ts";
-import { generateRSAKeys, RsaDecrypt, RsaEncrypt } from "./RSA.ts";
-import { sha1 } from "./SHA1.ts";
+import { generateRsaKeys, RsaDecrypt, RsaEncrypt } from "./rsa.ts";
+import { sha1 } from "./sha1.ts";
 import { base64ToBigInt, bigintToBase64, generateRandomKey } from "./utils.ts";
 
 // Initialize Oak application and router
@@ -19,13 +19,11 @@ const aesPage = await import("./pages/aes.ts");
 // Define routes
 router
   .get("/", ctx => {
-    // Pass custom input to the home page
     const html = homePage.render();
     ctx.response.body = html;
     ctx.response.type = "text/html";
   })
   .get("/sha-1", ctx => {
-    // Pass custom input to the about page
     const html = sha1Page.render({ text: "", result: "" });
     ctx.response.body = html;
     ctx.response.type = "text/html";
@@ -41,7 +39,6 @@ router
     ctx.response.type = "text/html";
   })
   .get("/aes", ctx => {
-    // Pass custom input to the about page
     const html = aesPage.render({
       text: "",
       key: "",
@@ -67,7 +64,6 @@ router
       const error = !validateKey(keyBuffer);
 
       if (error) {
-        // Pass custom input to the about page
         const html = aesPage.render({
           text,
           key,
@@ -84,7 +80,6 @@ router
 
     const encrypted = AesEncrypt(text, keyBuffer);
 
-    // Pass custom input to the about page
     const html = aesPage.render({
       text,
       key,
@@ -104,7 +99,6 @@ router
     const error = !validateKey(keyBuffer);
 
     if (error) {
-      // Pass custom input to the about page
       const html = aesPage.render({
         text: "",
         key,
@@ -120,7 +114,6 @@ router
 
     const decrypted = AesDecrypt(encrypted, keyBuffer);
 
-    // Pass custom input to the about page
     const html = aesPage.render({
       text: "",
       key,
@@ -132,7 +125,6 @@ router
     ctx.response.type = "text/html";
   })
   .get("/rsa", ctx => {
-    // Pass custom input to the about page
     const html = rsaPage.render({
       message: "",
       publicKey: "",
@@ -145,14 +137,13 @@ router
     ctx.response.type = "text/html";
   })
   .get("/rsa/generate", async ctx => {
-    const { publicKey, privateKey, primes } = generateRSAKeys();
+    const { publicKey, privateKey, primes } = generateRsaKeys();
     const { publicKeyPem, privateKeyPem } = await keysToPem({
       publicKey,
       privateKey,
       primes,
     });
 
-    // Pass custom input to the about page
     const html = rsaPage.render({
       message: "",
       publicKey: publicKeyPem,
@@ -172,7 +163,6 @@ router
     const privateKeyPem = body.get("privateKey") || "";
 
     if (!publicKeyPem || !privateKeyPem) {
-      // Pass custom input to the about page
       const html = rsaPage.render({
         message,
         publicKey: "",
@@ -191,7 +181,6 @@ router
 
     const encrypted = RsaEncrypt(message, publicKey);
 
-    // Pass custom input to the about page
     const html = rsaPage.render({
       message,
       publicKey: publicKeyPem,
@@ -211,7 +200,6 @@ router
     const privateKeyPem = body.get("privateKey") || "";
 
     if (!publicKeyPem || !privateKeyPem) {
-      // Pass custom input to the about page
       const html = rsaPage.render({
         message: "",
         publicKey: "",
@@ -230,7 +218,6 @@ router
 
     const decrypted = RsaDecrypt(base64ToBigInt(encrypted), privateKey);
 
-    // Pass custom input to the about page
     const html = rsaPage.render({
       message: "",
       publicKey: publicKeyPem,

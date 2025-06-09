@@ -1,6 +1,6 @@
 import { Buffer } from "node:buffer";
 import { randomBytes } from "node:crypto";
-import CryptoJS from "crypto-js";
+import CryptoJs from "crypto-js";
 import { input, toHexString } from "./utils.ts";
 
 export function validateKey(key: Buffer): boolean {
@@ -11,23 +11,23 @@ export function validateKey(key: Buffer): boolean {
 
 // Encrypt function returning Buffer
 export function AesEncrypt(text: string, key: Buffer): string {
-  const keyWordArray = CryptoJS.lib.WordArray.create(key);
+  const keyWordArray = CryptoJs.lib.WordArray.create(key);
 
-  const encrypted = CryptoJS.AES.encrypt(text, keyWordArray, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.Pkcs7,
+  const encrypted = CryptoJs.AES.encrypt(text, keyWordArray, {
+    mode: CryptoJs.mode.ECB,
+    padding: CryptoJs.pad.Pkcs7,
   });
   return encrypted.toString();
 }
 
 // Decrypt function returning string
 export function AesDecrypt(encrypted: string, key: Buffer): string {
-  const keyWordArray = CryptoJS.lib.WordArray.create(key);
-  const decrypted = CryptoJS.AES.decrypt(encrypted, keyWordArray, {
-    mode: CryptoJS.mode.ECB,
-    padding: CryptoJS.pad.Pkcs7,
+  const keyWordArray = CryptoJs.lib.WordArray.create(key);
+  const decrypted = CryptoJs.AES.decrypt(encrypted, keyWordArray, {
+    mode: CryptoJs.mode.ECB,
+    padding: CryptoJs.pad.Pkcs7,
   });
-  return decrypted.toString(CryptoJS.enc.Utf8);
+  return decrypted.toString(CryptoJs.enc.Utf8);
 }
 
 // Main AES-ECB encryption and decryption

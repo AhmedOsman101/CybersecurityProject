@@ -7,7 +7,7 @@ import { keysToPem } from "./pem.ts";
 import { bigintToBase64, bigintToBuffer, input } from "./utils.ts";
 
 // Generate prime candidates using LCG
-function generateLCGPrime(): bigint {
+function generateLcgPrime(): bigint {
   let candidate: bigint;
   do {
     candidate = getLcg(LCG);
@@ -19,14 +19,15 @@ function generateLCGPrime(): bigint {
 }
 
 // Generate RSA keys using LCG primes
-export function generateRSAKeys(): RsaKeyComponents {
+export function generateRsaKeys(): RsaKeyComponents {
   // 1. Key Generation
-  const p: bigint = generateLCGPrime();
-  let q: bigint = generateLCGPrime();
-  while (p === q) q = generateLCGPrime(); // Ensure distinct primes
+  const p: bigint = generateLcgPrime();
+  let q: bigint = generateLcgPrime();
+  while (p === q) q = generateLcgPrime(); // Ensure distinct primes
 
   // 2. Calculate n (Modulus)
   const n: bigint = p * q; // n = p * q
+
   // 3. Calculate phi(n) (Euler's Totient Function)
   const phi: bigint = (p - 1n) * (q - 1n); // φ(n) = (p-1)(q-1)
 
@@ -53,10 +54,13 @@ export function RsaEncrypt(message: string, publicKey: PublicKey): bigint {
 // Function to decrypt a ciphertext
 export function RsaDecrypt(ciphertext: bigint, privateKey: PrivateKey): string {
   const decryptedBigInt = modPower(ciphertext, privateKey.d, privateKey.n); // m = c^d (mod n)
+
   const decryptedHex = decryptedBigInt.toString(16); // 16 => hex
+
   // Pad with leading zero if the hex string has an odd length
   const paddedHex =
     decryptedHex.length % 2 === 0 ? decryptedHex : `0${decryptedHex}`;
+
   const messageBuffer = Buffer.from(paddedHex, "hex");
   return messageBuffer.toString("utf-8");
 }
@@ -65,7 +69,7 @@ export async function RsaTest() {
   console.log("# ---- RSA ---- #");
 
   // --- Generate RSA keys --- //
-  const { publicKey, privateKey, primes } = generateRSAKeys();
+  const { publicKey, privateKey, primes } = generateRsaKeys();
   const { publicKeyPem, privateKeyPem } = await keysToPem({
     publicKey,
     privateKey,

@@ -4,7 +4,7 @@ import { ab2b64, base64UrlToBigInt, toBase64Url } from "./utils.ts";
 
 /** Insert `\n` every 64 chars */
 function wrap64(b64: string): string {
-  // biome-ignore lint/style/noNonNullAssertion: <explanation>
+  // biome-ignore lint/style/noNonNullAssertion: The RegEx is always valid
   return b64.match(/.{1,64}/g)!.join("\n");
 }
 
