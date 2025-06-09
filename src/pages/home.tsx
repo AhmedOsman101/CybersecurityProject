@@ -1,7 +1,6 @@
-import Body from "./components/body.ts";
-import Navbar from "./components/navbar.ts";
+import Navbar from "./components/navbar.tsx";
 
-export function render(): string {
+function HomePage() {
   const links = [
     {
       url: "/sha-1",
@@ -17,8 +16,7 @@ export function render(): string {
     },
   ];
 
-  return Body(
-    "Cybersecurity Project",
-    Navbar("Encryption/Decryption Tools", links)
-  );
+  return Navbar("Encryption/Decryption Tools", links);
 }
+
+export default HomePage;
