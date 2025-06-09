@@ -1,59 +1,78 @@
 import { Buffer } from "node:buffer";
-import { Application, Router } from "@oak/oak";
+import { Hono } from "hono";
 import { AesDecrypt, AesEncrypt, validateKey } from "./aes.ts";
+import AesPage from "./pages/aes.tsx";
+import MainBody from "./pages/components/body.tsx";
+import HomePage from "./pages/home.tsx";
+import RsaPage from "./pages/rsa.tsx";
+import Sha1Page from "./pages/sha1.tsx";
 import { keysToPem, pemToComponents } from "./pem.ts";
 import { generateRsaKeys, RsaDecrypt, RsaEncrypt } from "./rsa.ts";
 import { sha1 } from "./sha1.ts";
 import { base64ToBigInt, bigintToBase64, generateRandomKey } from "./utils.ts";
 
-// Initialize Oak application and router
-const app = new Application();
-const router = new Router();
+// Initialize Hono application
+const app = new Hono();
 
-// Import page modules dynamically
-const homePage = await import("./pages/home.ts");
-const rsaPage = await import("./pages/rsa.ts");
-const sha1Page = await import("./pages/sha1.ts");
-const aesPage = await import("./pages/aes.ts");
+declare module "hono" {
+  interface ContextRenderer {
+    // biome-ignore lint/style/useShorthandFunctionType: Overrides the existing interface
+    (
+      pageTitle: string,
+      slot: string | Promise<string>
+    ): Response | Promise<Response>;
+  }
+}
+
+// Use layout middleware
+app.use(async (c, next) => {
+  c.setRenderer((pageTitle, slot) => {
+    return c.html(MainBody(pageTitle, slot));
+  });
+  await next();
+});
 
 // Define routes
-router
-  .get("/", ctx => {
-    const html = homePage.render();
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
-  })
-  .get("/sha-1", ctx => {
-    const html = sha1Page.render({ text: "", result: "" });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
-  })
-  .post("/sha-1", async ctx => {
-    const body = await ctx.request.body.form();
+app
+  .get("/", c => c.render("Cybersecurity Project", HomePage()))
 
-    const text = body.get("text") || "";
+  .get("/sha-1", c =>
+    c.render(
+      "Cybersecurity Project - SHA-1",
+      Sha1Page({ text: "", result: "" })
+    )
+  )
+
+  .post("/sha-1", async c => {
+    const body = await c.req.formData();
+
+    const text = body.get("text")?.toString() || "";
     const result = sha1(text);
 
-    const html = sha1Page.render({ text, result });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
+    return c.render(
+      "Cybersecurity Project - SHA-1",
+      Sha1Page({ text, result })
+    );
   })
-  .get("/aes", ctx => {
-    const html = aesPage.render({
-      text: "",
-      key: "",
-      encrypted: "",
-      decrypted: "",
-      mode: "e",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
-  })
-  .post("/aes/encrypt", async ctx => {
-    const body = await ctx.request.body.form();
 
-    const text = body.get("text") || "";
-    let key = body.get("key");
+  .get("/aes", c =>
+    c.render(
+      "Cybersecurity Project - AES-ECB",
+      AesPage({
+        text: "",
+        key: "",
+        encrypted: "",
+        decrypted: "",
+        mode: "e",
+      })
+    )
+  )
+
+  .post("/aes/encrypt", async c => {
+    const body = await c.req.formData();
+
+    const text = body.get("text")?.toString() || "";
+    let key = body.get("key")?.toString();
     let keyBuffer: Buffer;
 
     if (!key) {
@@ -64,79 +83,85 @@ router
       const error = !validateKey(keyBuffer);
 
       if (error) {
-        const html = aesPage.render({
-          text,
-          key,
-          encrypted: "",
-          decrypted: "",
-          error,
-          mode: "e",
-        });
-        ctx.response.body = html;
-        ctx.response.type = "text/html";
-        return;
+        return c.render(
+          "Cybersecurity Project - AES-ECB",
+          AesPage({
+            text,
+            key,
+            encrypted: "",
+            decrypted: "",
+            error,
+            mode: "e",
+          })
+        );
       }
     }
 
     const encrypted = AesEncrypt(text, keyBuffer);
 
-    const html = aesPage.render({
-      text,
-      key,
-      encrypted,
-      decrypted: "",
-      mode: "e",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
+    return c.render(
+      "Cybersecurity Project - AES-ECB",
+      AesPage({
+        text,
+        key,
+        encrypted,
+        decrypted: "",
+        mode: "e",
+      })
+    );
   })
-  .post("/aes/decrypt", async ctx => {
-    const body = await ctx.request.body.form();
 
-    const encrypted = body.get("encrypted") || "";
-    const key = body.get("key") || "";
+  .post("/aes/decrypt", async c => {
+    const body = await c.req.formData();
+
+    const encrypted = body.get("encrypted")?.toString() || "";
+    const key = body.get("key")?.toString() || "";
     const keyBuffer: Buffer = Buffer.from(key);
     const error = !validateKey(keyBuffer);
 
     if (error) {
-      const html = aesPage.render({
-        text: "",
-        key,
-        encrypted,
-        decrypted: "",
-        error,
-        mode: "d",
-      });
-      ctx.response.body = html;
-      ctx.response.type = "text/html";
-      return;
+      return c.render(
+        "Cybersecurity Project - AES-ECB",
+        AesPage({
+          text: "",
+          key,
+          encrypted,
+          decrypted: "",
+          error,
+          mode: "d",
+        })
+      );
     }
 
     const decrypted = AesDecrypt(encrypted, keyBuffer);
 
-    const html = aesPage.render({
-      text: "",
-      key,
-      encrypted,
-      decrypted,
-      mode: "d",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
+    return c.render(
+      "Cybersecurity Project - AES-ECB",
+      AesPage({
+        text: "",
+        key,
+        encrypted,
+        decrypted,
+        mode: "d",
+      })
+    );
   })
-  .get("/rsa", ctx => {
-    const html = rsaPage.render({
-      message: "",
-      publicKey: "",
-      privateKey: "",
-      encrypted: "",
-      decrypted: "",
-      mode: "g",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
-  })
-  .get("/rsa/generate", async ctx => {
+
+  .get("/rsa", c =>
+    c.render(
+      "Cybersecurity Project - RSA with LCG",
+      RsaPage({
+        message: "",
+        publicKey: "",
+        privateKey: "",
+        encrypted: "",
+        decrypted: "",
+        mode: "g",
+      })
+    )
+  )
+
+  .get("/rsa/generate", async c => {
     const { publicKey, privateKey, primes } = generateRsaKeys();
     const { publicKeyPem, privateKeyPem } = await keysToPem({
       publicKey,
@@ -144,96 +169,93 @@ router
       primes,
     });
 
-    const html = rsaPage.render({
-      message: "",
-      publicKey: publicKeyPem,
-      privateKey: privateKeyPem,
-      encrypted: "",
-      decrypted: "",
-      mode: "g",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
-  })
-  .post("/rsa/encrypt", async ctx => {
-    const body = await ctx.request.body.form();
-
-    const message = body.get("message") || "";
-    const publicKeyPem = body.get("publicKey") || "";
-    const privateKeyPem = body.get("privateKey") || "";
-
-    if (!publicKeyPem || !privateKeyPem) {
-      const html = rsaPage.render({
-        message,
-        publicKey: "",
-        privateKey: "",
+    return c.render(
+      "Cybersecurity Project - RSA with LCG",
+      RsaPage({
+        message: "",
+        publicKey: publicKeyPem,
+        privateKey: privateKeyPem,
         encrypted: "",
         decrypted: "",
-        mode: "e",
-        error: true,
-      });
-      ctx.response.body = html;
-      ctx.response.type = "text/html";
-      return;
+        mode: "g",
+      })
+    );
+  })
+  .post("/rsa/encrypt", async c => {
+    const body = await c.req.formData();
+
+    const message = body.get("message")?.toString() || "";
+    const publicKeyPem = body.get("publicKey")?.toString() || "";
+    const privateKeyPem = body.get("privateKey")?.toString() || "";
+
+    if (!publicKeyPem || !privateKeyPem) {
+      return c.render(
+        "Cybersecurity Project - RSA with LCG",
+        RsaPage({
+          message,
+          publicKey: "",
+          privateKey: "",
+          encrypted: "",
+          decrypted: "",
+          mode: "e",
+          error: true,
+        })
+      );
     }
 
     const { publicKey } = await pemToComponents(publicKeyPem, privateKeyPem);
 
     const encrypted = RsaEncrypt(message, publicKey);
-
-    const html = rsaPage.render({
-      message,
-      publicKey: publicKeyPem,
-      privateKey: privateKeyPem,
-      encrypted: bigintToBase64(encrypted),
-      decrypted: "",
-      mode: "e",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
+    return c.render(
+      "Cybersecurity Project - RSA with LCG",
+      RsaPage({
+        message,
+        publicKey: publicKeyPem,
+        privateKey: privateKeyPem,
+        encrypted: bigintToBase64(encrypted),
+        decrypted: "",
+        mode: "e",
+      })
+    );
   })
-  .post("/rsa/decrypt", async ctx => {
-    const body = await ctx.request.body.form();
 
-    const encrypted = body.get("encrypted") || "";
-    const publicKeyPem = body.get("publicKey") || "";
-    const privateKeyPem = body.get("privateKey") || "";
+  .post("/rsa/decrypt", async c => {
+    const body = await c.req.formData();
+
+    const encrypted = body.get("encrypted")?.toString() || "";
+    const publicKeyPem = body.get("publicKey")?.toString() || "";
+    const privateKeyPem = body.get("privateKey")?.toString() || "";
 
     if (!publicKeyPem || !privateKeyPem) {
-      const html = rsaPage.render({
-        message: "",
-        publicKey: "",
-        privateKey: "",
-        encrypted,
-        decrypted: "",
-        mode: "d",
-        error: true,
-      });
-      ctx.response.body = html;
-      ctx.response.type = "text/html";
-      return;
+      return c.render(
+        "Cybersecurity Project - RSA with LCG",
+        RsaPage({
+          message: "",
+          publicKey: "",
+          privateKey: "",
+          encrypted,
+          decrypted: "",
+          mode: "d",
+          error: true,
+        })
+      );
     }
 
     const { privateKey } = await pemToComponents(publicKeyPem, privateKeyPem);
 
     const decrypted = RsaDecrypt(base64ToBigInt(encrypted), privateKey);
-
-    const html = rsaPage.render({
-      message: "",
-      publicKey: publicKeyPem,
-      privateKey: privateKeyPem,
-      encrypted,
-      decrypted,
-      mode: "d",
-    });
-    ctx.response.body = html;
-    ctx.response.type = "text/html";
+    return c.render(
+      "Cybersecurity Project - RSA with LCG",
+      RsaPage({
+        message: "",
+        publicKey: publicKeyPem,
+        privateKey: privateKeyPem,
+        encrypted,
+        decrypted,
+        mode: "d",
+      })
+    );
   });
 
-// Use router middleware
-app.use(router.routes());
-app.use(router.allowedMethods());
-
 // Start the server
-console.log("Server running on http://localhost:5000");
-await app.listen({ port: 5000 });
+Deno.serve({ port: 5000 }, app.fetch);
