@@ -23,12 +23,9 @@ rsaController.get("/", c =>
 );
 
 rsaController.get("/generate", async c => {
-  const { publicKey, privateKey, primes } = RsaService.generateRsaKeys();
-  const { publicKeyPem, privateKeyPem } = await PemService.keysToPem({
-    publicKey,
-    privateKey,
-    primes,
-  });
+  const { publicKeyPem, privateKeyPem } = await PemService.keysToPem(
+    RsaService.generateRsaKeys()
+  );
 
   return c.render(
     title,
