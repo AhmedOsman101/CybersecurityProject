@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import aesController from "./contollers/aesController.ts";
 import rsaController from "./contollers/rsaController.ts";
 import sha1Controller from "./contollers/sha1Controller.ts";
-import MainBody from "./pages/components/body.tsx";
-import HomePage from "./pages/home.tsx";
+import MainBody from "./views/components/body.tsx";
+import HomePage from "./views/HomePage.tsx";
 
 // Initialize Hono application
 const app = new Hono();
