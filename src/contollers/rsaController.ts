@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import RsaPage from "../pages/rsa.tsx";
-import { keysToPem, pemToComponents } from "../pem.ts";
-import { generateRsaKeys, RsaDecrypt, RsaEncrypt } from "../rsa.ts";
 import { base64ToBigInt, bigintToBase64 } from "../lib/utils.ts";
+import { PemService } from "../services/pemService.ts";
+import { RsaService } from "../services/rsaService.ts";
+import RsaPage from "../views/RsaPage.tsx";
 
 const rsaController = new Hono();
 
@@ -21,8 +21,8 @@ rsaController.get("/", c =>
 );
 
 rsaController.get("/generate", async c => {
-  const { publicKey, privateKey, primes } = generateRsaKeys();
-  const { publicKeyPem, privateKeyPem } = await keysToPem({
+  const { publicKey, privateKey, primes } = RsaService.generateRsaKeys();
+  const { publicKeyPem, privateKeyPem } = await PemService.keysToPem({
     publicKey,
     privateKey,
     primes,
@@ -63,9 +63,12 @@ rsaController.post("/encrypt", async c => {
     );
   }
 
-  const { publicKey } = await pemToComponents(publicKeyPem, privateKeyPem);
+  const { publicKey } = await PemService.pemToComponents(
+    publicKeyPem,
+    privateKeyPem
+  );
 
-  const encrypted = RsaEncrypt(message, publicKey);
+  const encrypted = RsaService.encrypt(message, publicKey);
   return c.render(
     "Cybersecurity Project - RSA with LCG",
     RsaPage({
@@ -101,9 +104,12 @@ rsaController.post("/decrypt", async c => {
     );
   }
 
-  const { privateKey } = await pemToComponents(publicKeyPem, privateKeyPem);
+  const { privateKey } = await PemService.pemToComponents(
+    publicKeyPem,
+    privateKeyPem
+  );
 
-  const decrypted = RsaDecrypt(base64ToBigInt(encrypted), privateKey);
+  const decrypted = RsaService.decrypt(base64ToBigInt(encrypted), privateKey);
   return c.render(
     "Cybersecurity Project - RSA with LCG",
     RsaPage({

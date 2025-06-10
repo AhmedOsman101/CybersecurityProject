@@ -1,8 +1,8 @@
 import { Buffer } from "node:buffer";
 import { Hono } from "hono";
-import { AesDecrypt, AesEncrypt, validateKey } from "../aes.ts";
-import AesPage from "../pages/aes.tsx";
 import { generateRandomKey } from "../lib/utils.ts";
+import { AesService } from "../services/aesService.ts";
+import AesPage from "../views/AesPage.tsx";
 
 const aesController = new Hono().basePath("/");
 
@@ -31,7 +31,7 @@ aesController.post("/encrypt", async c => {
     keyBuffer = Buffer.from(key);
   } else {
     keyBuffer = Buffer.from(key);
-    const error = !validateKey(keyBuffer);
+    const error = !AesService.validateKey(keyBuffer);
 
     if (error) {
       return c.render(
@@ -48,7 +48,7 @@ aesController.post("/encrypt", async c => {
     }
   }
 
-  const encrypted = AesEncrypt(text, keyBuffer);
+  const encrypted = AesService.encrypt(text, keyBuffer);
 
   return c.render(
     "Cybersecurity Project - AES-ECB",
@@ -68,7 +68,7 @@ aesController.post("/decrypt", async c => {
   const encrypted = body.get("encrypted")?.toString() || "";
   const key = body.get("key")?.toString() || "";
   const keyBuffer: Buffer = Buffer.from(key);
-  const error = !validateKey(keyBuffer);
+  const error = !AesService.validateKey(keyBuffer);
 
   if (error) {
     return c.render(
@@ -84,7 +84,7 @@ aesController.post("/decrypt", async c => {
     );
   }
 
-  const decrypted = AesDecrypt(encrypted, keyBuffer);
+  const decrypted = AesService.decrypt(encrypted, keyBuffer);
 
   return c.render(
     "Cybersecurity Project - AES-ECB",
