@@ -55,7 +55,10 @@ function RsaPage({
           </textarea>
         </div>
         <div className="full-width">
-          <button onclick="window.location.href = '/rsa/generate'" type="button">
+          <button
+            onclick="window.location.href = '/rsa/generate'"
+            type="button"
+          >
             Generate Keys
           </button>{" "}
         </div>
