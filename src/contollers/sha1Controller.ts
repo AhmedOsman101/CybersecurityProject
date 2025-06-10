@@ -4,8 +4,10 @@ import Sha1Page from "../views/Sha1Page.tsx";
 
 const sha1Controller = new Hono();
 
+const title = "Cybersecurity Project - SHA-1" as const;
+
 sha1Controller.get("/", c =>
-  c.render("Cybersecurity Project - SHA-1", Sha1Page({ text: "", result: "" }))
+  c.render(title, Sha1Page({ text: "", result: "" }))
 );
 
 sha1Controller.post("/", async c => {
@@ -14,7 +16,7 @@ sha1Controller.post("/", async c => {
   const text = body.get("text")?.toString() || "";
   const result = Sha1Service.sha1(text);
 
-  return c.render("Cybersecurity Project - SHA-1", Sha1Page({ text, result }));
+  return c.render(title, Sha1Page({ text, result }));
 });
 
 export default sha1Controller;

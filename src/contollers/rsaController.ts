@@ -6,9 +6,11 @@ import RsaPage from "../views/RsaPage.tsx";
 
 const rsaController = new Hono();
 
+const title = "Cybersecurity Project - RSA with LCG" as const;
+
 rsaController.get("/", c =>
   c.render(
-    "Cybersecurity Project - RSA with LCG",
+    title,
     RsaPage({
       message: "",
       publicKey: "",
@@ -29,7 +31,7 @@ rsaController.get("/generate", async c => {
   });
 
   return c.render(
-    "Cybersecurity Project - RSA with LCG",
+    title,
     RsaPage({
       message: "",
       publicKey: publicKeyPem,
@@ -50,7 +52,7 @@ rsaController.post("/encrypt", async c => {
 
   if (!publicKeyPem || !privateKeyPem) {
     return c.render(
-      "Cybersecurity Project - RSA with LCG",
+      title,
       RsaPage({
         message,
         publicKey: "",
@@ -70,7 +72,7 @@ rsaController.post("/encrypt", async c => {
 
   const encrypted = RsaService.encrypt(message, publicKey);
   return c.render(
-    "Cybersecurity Project - RSA with LCG",
+    title,
     RsaPage({
       message,
       publicKey: publicKeyPem,
@@ -91,7 +93,7 @@ rsaController.post("/decrypt", async c => {
 
   if (!publicKeyPem || !privateKeyPem) {
     return c.render(
-      "Cybersecurity Project - RSA with LCG",
+      title,
       RsaPage({
         message: "",
         publicKey: "",
@@ -111,7 +113,7 @@ rsaController.post("/decrypt", async c => {
 
   const decrypted = RsaService.decrypt(base64ToBigInt(encrypted), privateKey);
   return c.render(
-    "Cybersecurity Project - RSA with LCG",
+    title,
     RsaPage({
       message: "",
       publicKey: publicKeyPem,

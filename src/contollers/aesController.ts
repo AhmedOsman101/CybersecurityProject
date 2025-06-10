@@ -6,9 +6,11 @@ import AesPage from "../views/AesPage.tsx";
 
 const aesController = new Hono().basePath("/");
 
+const title = "Cybersecurity Project - AES-ECB" as const;
+
 aesController.get("/", c =>
   c.render(
-    "Cybersecurity Project - AES-ECB",
+    title,
     AesPage({
       text: "",
       key: "",
@@ -35,7 +37,7 @@ aesController.post("/encrypt", async c => {
 
     if (error) {
       return c.render(
-        "Cybersecurity Project - AES-ECB",
+        title,
         AesPage({
           text,
           key,
@@ -51,7 +53,7 @@ aesController.post("/encrypt", async c => {
   const encrypted = AesService.encrypt(text, keyBuffer);
 
   return c.render(
-    "Cybersecurity Project - AES-ECB",
+    title,
     AesPage({
       text,
       key,
@@ -72,7 +74,7 @@ aesController.post("/decrypt", async c => {
 
   if (error) {
     return c.render(
-      "Cybersecurity Project - AES-ECB",
+      title,
       AesPage({
         text: "",
         key,
@@ -87,7 +89,7 @@ aesController.post("/decrypt", async c => {
   const decrypted = AesService.decrypt(encrypted, keyBuffer);
 
   return c.render(
-    "Cybersecurity Project - AES-ECB",
+    title,
     AesPage({
       text: "",
       key,
