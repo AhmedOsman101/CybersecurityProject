@@ -1,4 +1,4 @@
-import Navbar from "./components/navbar.tsx";
+import Navbar from "./components/Navbar.tsx";
 
 type Props = {
   text: string;
