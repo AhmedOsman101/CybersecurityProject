@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import RsaPage from "../pages/rsa.tsx";
 import { keysToPem, pemToComponents } from "../pem.ts";
 import { generateRsaKeys, RsaDecrypt, RsaEncrypt } from "../rsa.ts";
-import { base64ToBigInt, bigintToBase64 } from "../utils.ts";
+import { base64ToBigInt, bigintToBase64 } from "../lib/utils.ts";
 
 const rsaController = new Hono();
 

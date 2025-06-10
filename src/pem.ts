@@ -1,8 +1,8 @@
-import type { PublicKey, RsaKeyComponents } from "./index.d.ts";
+import { ab2b64, base64UrlToBigInt, toBase64Url } from "./lib/utils.ts";
 import { modInverse } from "./math.ts";
-import { ab2b64, base64UrlToBigInt, toBase64Url } from "./utils.ts";
+import type { PublicKey, RsaKeyComponents } from "./rsa.d.ts";
 
-/** Insert `\n` every 64 chars */
+// Insert `\n` every 64 chars
 function wrap64(b64: string): string {
   // biome-ignore lint/style/noNonNullAssertion: The RegEx is always valid
   return b64.match(/.{1,64}/g)!.join("\n");

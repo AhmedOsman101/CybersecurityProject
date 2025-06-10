@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { input } from "./utils.ts";
+import { input } from "./lib/utils.ts";
 
 /**
  * Perform a 32-bit circular left rotation on a number.

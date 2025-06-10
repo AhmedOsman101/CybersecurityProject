@@ -2,7 +2,7 @@ import { Buffer } from "node:buffer";
 import { Hono } from "hono";
 import { AesDecrypt, AesEncrypt, validateKey } from "../aes.ts";
 import AesPage from "../pages/aes.tsx";
-import { generateRandomKey } from "../utils.ts";
+import { generateRandomKey } from "../lib/utils.ts";
 
 const aesController = new Hono().basePath("/");
 

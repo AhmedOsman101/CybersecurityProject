@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { randomBytes } from "node:crypto";
 import CryptoJs from "crypto-js";
-import { input, toHexString } from "./utils.ts";
+import { input, toHexString } from "./lib/utils.ts";
 
 export function validateKey(key: Buffer): boolean {
   const keyString = key.toString("utf8");
