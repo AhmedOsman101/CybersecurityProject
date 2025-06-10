@@ -27,7 +27,7 @@ aesController.post("/encrypt", async c => {
   let keyBuffer: Buffer;
 
   if (!key) {
-    key = generateRandomKey(16);
+    key = generateRandomKey(32);
     keyBuffer = Buffer.from(key);
   } else {
     keyBuffer = Buffer.from(key);
