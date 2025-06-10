@@ -26,11 +26,24 @@ export function modInverse(a: bigint, m: bigint): bigint {
 // Helper function for modular exponentiation
 export function modPower(base: bigint, exp: bigint, modulus: bigint): bigint {
   let result = 1n;
-  base %= modulus;
-  while (exp > 0n) {
-    if (exp % 2n === 1n) result = (result * base) % modulus;
-    base = (base * base) % modulus;
-    exp /= 2n;
+  let newBase = base % modulus;
+  let newExponent = exp;
+
+  while (newExponent > 0n) {
+    if (newExponent % 2n === 1n) result = (result * newBase) % modulus;
+    newBase = (newBase * newBase) % modulus;
+    newExponent /= 2n;
   }
   return result;
+}
+
+/**
+ * Perform a 32-bit circular left rotation on a number.
+ * @param x - The 32-bit value to rotate.
+ * @param n - Number of bits to rotate to the left.
+ * @returns The result of rotating x left by n bits (unsigned 32-bit).
+ */
+export function rotateLeft(x: number, n: number): number {
+  // Shift left by n and shift right (unsigned) by (32 - n), then combine
+  return ((x << n) | (x >>> (32 - n))) >>> 0;
 }
